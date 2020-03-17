@@ -6,6 +6,11 @@
 
 Line::Line(int x1, int y1, int x2, int y2) : p1_x(x1), p1_y(y1), p2_x(x2), p2_y(y2) {}
 
+bool Line::checkPoint(Coordinate x, Coordinate y) const {
+    return true;
+}
+
+
 Circle::Circle(int x, int y, int r) : center_x(x), center_y(y), radius(r) {}
 
 
@@ -95,4 +100,25 @@ std::vector<Point> intersection(Circle a, Circle b) {
 
 ll square(ll x) {
     return x * x;
+}
+
+bool HalfLine::checkPoint(Coordinate x, Coordinate y) const {
+    Coordinate xc1(p1_x, 1);
+    Coordinate yc1(p1_y, 1);
+    Coordinate xc2(p2_x, 1);
+    Coordinate yc2(p2_y, 1);
+
+    if ((x < xc1 || x == xc1) && (xc2 < xc1 || xc2 == xc1)) {
+        return true;
+    }
+    if ((x > xc1 || x == xc1) && (xc2 > xc1 || xc2 == xc1)) {
+        return true;
+    }
+    if ((y < yc1 || y == yc1) && (yc2 < yc1 || yc2 == yc1)) {
+        return true;
+    }
+    if ((y > yc1 || y == yc1) && (yc2 > yc1 || yc2 == yc1)) {
+        return true;
+    }
+    return false;
 }

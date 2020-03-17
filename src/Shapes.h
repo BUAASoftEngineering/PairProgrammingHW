@@ -17,7 +17,14 @@ public:
 
     int p1_x, p1_y;
     int p2_x, p2_y;
+
+    virtual bool checkPoint(Coordinate x, Coordinate y) const ;
 };
+
+class HalfLine: public Line {
+    bool checkPoint(Coordinate x, Coordinate y) const override ;
+};
+
 
 
 class Circle {

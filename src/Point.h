@@ -40,6 +40,12 @@ public:
     Coordinate(ll a, ll b, ll c, ll btm);  // ( a + b * sqrt(c) ) / btm, ---> (1) A/ B (2) double value
     Coordinate() = default;
 
+    bool operator<(const Coordinate &other) const;
+
+    bool operator==(const Coordinate &other) const;
+
+    bool operator>(const Coordinate &other) const;
+
     friend std::ostream &operator<<(std::ostream &os, const Coordinate &coordinate);
 
     bool isInf() const {
@@ -48,11 +54,11 @@ public:
 
     std::size_t hashCode() const {
         if (isRational) {
-            std::size_t h1 = std::hash<long long>{}(top);
-            std::size_t h2 = std::hash<long long>{}(bottom);
+            std::size_t h1 = std::hash < long long > {}(top);
+            std::size_t h2 = std::hash < long long > {}(bottom);
             return ((h1 ^ (h2 << 1u)) << 1u) | 1u;
         } else {
-            std::size_t h = std::hash<double>{}(value);
+            std::size_t h = std::hash < double > {}(value);
             return (h << 1u) | 0u;
         }
     }

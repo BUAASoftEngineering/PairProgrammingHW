@@ -77,6 +77,32 @@ std::ostream &operator<<(std::ostream &os, const Coordinate &coordinate) {
     }
 }
 
+bool Coordinate::operator<(const Coordinate &other) const {
+    if (isRational && other.isRational) {
+        return top * other.bottom < other.top * bottom;
+    } else if ((isRational && !other.isRational)) {
+        double valRat = (double) top / bottom;
+        return valRat < other.value;
+    } else if (!isRational && other.isRational) {
+        double valRat = (double) other.top / other.bottom;
+        return value < valRat;
+    } else {
+        return value < other.value;
+    }
+}
+
+bool Coordinate::operator==(const Coordinate &other) const {
+    if (isRational) {
+        return (other.isRational & (top == other.top) & (bottom == other.bottom));
+    } else {
+        return ((!other.isRational) & ((long long) (value * 1e8) == (long long) (other.value * 1e8)));
+    }
+}
+
+bool Coordinate::operator>(const Coordinate &other) const {
+    return !(*this == other) && !(*this < other);
+}
+
 
 Point::Point(Coordinate xx, Coordinate yy) : x(xx), y(yy) {}
 
