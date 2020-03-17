@@ -4,9 +4,18 @@
 
 #include "Shapes.h"
 
-Line::Line(int x1, int y1, int x2, int y2) : p1_x(x1), p1_y(y1), p2_x(x2), p2_y(y2) {}
+Line::Line(int x1, int y1, int x2, int y2) : p1_x(x1), p1_y(y1), p2_x(x2), p2_y(y2),
+                                             type(LineType::LINE) {}
 
-bool Line::checkPoint(Coordinate x, Coordinate y) const {
+Line::Line(int x1, int y1, int x2, int y2, int type) :
+        p1_x(x1), p1_y(y1), p2_x(x2), p2_y(y2), type(type) {}
+
+bool Line::checkPoint(const Coordinate &x, const Coordinate &y) const {
+    if (type == LineType::HALF_LINE) {
+        return checkPointHalf(x, y, *this);
+    } else if (type == LineType::SEGMENT_LINE) {
+        return checkPointSegment(x, y, *this);
+    }
     return true;
 }
 
@@ -31,15 +40,27 @@ std::vector<Point> intersection(Line a, Circle b) {
     if (delta < 0)
         return container;
     else if (delta == 0) {
-        container.emplace_back(Coordinate(D * dy + b.center_x * dr2, dr2), Coordinate(-D * dx + b.center_y * dr2, dr2));
+        Coordinate x(D * dy + b.center_x * dr2, dr2);
+        Coordinate y(-D * dx + b.center_y * dr2, dr2);
+        if (a.checkPoint(x, y)) {
+            container.emplace_back(x, y);
+        }
         return container;
     } else {
         ll coeff_xx = dx * ((dy >= 0) ? 1 : -1);
         ll coeff_yy = abs(dy);
-        container.emplace_back(Coordinate(D * dy + b.center_x * dr2, coeff_xx, delta, dr2),
-                               Coordinate(-D * dx + b.center_y * dr2, coeff_yy, delta, dr2));
-        container.emplace_back(Coordinate(D * dy + b.center_x * dr2, -coeff_xx, delta, dr2),
-                               Coordinate(-D * dx + b.center_y * dr2, -coeff_yy, delta, dr2));
+
+        Coordinate xc1(D * dy + b.center_x * dr2, coeff_xx, delta, dr2);
+        Coordinate yc1(-D * dx + b.center_y * dr2, coeff_yy, delta, dr2);
+        if (a.checkPoint(xc1, yc1)) {
+            container.emplace_back(xc1, yc1);
+        }
+
+        Coordinate xc2(D * dy + b.center_x * dr2, -coeff_xx, delta, dr2);
+        Coordinate yc2(-D * dx + b.center_y * dr2, -coeff_yy, delta, dr2);
+        if (a.checkPoint(xc2, yc2)) {
+            container.emplace_back(xc2, yc2);
+        }
         return container;
     }
 }
@@ -64,7 +85,9 @@ std::vector<Point> intersection(Line a, Line b) {
     if (xx.isInf() || yy.isInf())
         return container;
     else {
-        container.emplace_back(xx, yy);
+        if (a.checkPoint(xx, yy) && b.checkPoint(xx, yy)) {
+            container.emplace_back(xx, yy);
+        }
         return container;
     }
 }
@@ -102,11 +125,12 @@ ll square(ll x) {
     return x * x;
 }
 
-bool HalfLine::checkPoint(Coordinate x, Coordinate y) const {
-    Coordinate xc1(p1_x, 1);
-    Coordinate yc1(p1_y, 1);
-    Coordinate xc2(p2_x, 1);
-    Coordinate yc2(p2_y, 1);
+bool checkPointHalf(const Coordinate &x, const Coordinate &y,
+                    const Line &line) {
+    Coordinate xc1(line.p1_x, 1);
+    Coordinate yc1(line.p1_y, 1);
+    Coordinate xc2(line.p2_x, 1);
+    Coordinate yc2(line.p2_y, 1);
 
     if ((x < xc1 || x == xc1) && (xc2 < xc1 || xc2 == xc1)) {
         return true;
@@ -123,4 +147,28 @@ bool HalfLine::checkPoint(Coordinate x, Coordinate y) const {
     return false;
 }
 
-HalfLine::HalfLine(int x1, int y1, int x2, int y2) : Line(x1, y1, x2, y2) {}
+//HalfLine::HalfLine(int x1, int y1, int x2, int y2) : Line(x1, y1, x2, y2) {}
+//
+//SegmentLine::SegmentLine(int x1, int y1, int x2, int y2) : Line(x1, y1, x2, y2) {}
+
+bool checkPointSegment(const Coordinate &x, const Coordinate &y,
+                       const Line &line) {
+    Coordinate xc1(line.p1_x, 1);
+    Coordinate yc1(line.p1_y, 1);
+    Coordinate xc2(line.p2_x, 1);
+    Coordinate yc2(line.p2_y, 1);
+
+    if ((x < xc1 || x == xc1) && (xc2 < x || xc2 == x)) {
+        return true;
+    }
+    if ((x > xc1 || x == xc1) && (xc2 > x || xc2 == x)) {
+        return true;
+    }
+    if ((y < yc1 || y == yc1) && (yc2 < y || yc2 == y)) {
+        return true;
+    }
+    if ((y > yc1 || y == yc1) && (yc2 > y || yc2 == y)) {
+        return true;
+    }
+    return false;
+}

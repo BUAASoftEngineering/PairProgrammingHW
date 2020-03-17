@@ -30,6 +30,12 @@ int main(int argc, char *argv[]) {
         } else if (objType == 'C') {
             scanf("%d%d%d", &x1, &y1, &x2);
             objs->emplace_back(Circle(x1, y1, x2));
+        } else if (objType == 'R') {
+            scanf("%d%d%d%d",  &x1, &y1, &x2, &y2);
+            objs->emplace_back(Line(x1, y1, x2, y2, LineType::HALF_LINE));
+        } else if (objType == 'S') {
+            scanf("%d%d%d%d",  &x1, &y1, &x2, &y2);
+            objs->emplace_back(Line(x1, y1, x2, y2, LineType::SEGMENT_LINE));
         } else
             continue;
     }
