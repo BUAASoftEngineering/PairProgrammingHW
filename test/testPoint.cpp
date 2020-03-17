@@ -142,7 +142,7 @@ TEST(OnLineTest, Line) {
 
 TEST(OnLineTest, HalfLine) {
     // y = 3x
-    HalfLine halfline(0, 0, 100000, 300000);
+    Line halfline(0, 0, 100000, 300000, LineType::HALF_LINE);
     // (0, 0)
     Coordinate x1(-0, 100);
     Coordinate y1(4, -2, 4, -4);
