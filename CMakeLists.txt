@@ -14,6 +14,7 @@ include_directories(src
 add_executable(TestPoint
         test/testPoint.cpp
         src/Point.cpp
+        src/Shapes.cpp
         external/googletest)
 target_link_libraries(TestPoint gtest_main)
 

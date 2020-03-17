@@ -22,7 +22,10 @@ public:
 };
 
 class HalfLine: public Line {
+public:
     bool checkPoint(Coordinate x, Coordinate y) const override ;
+
+    HalfLine(int x1, int y1, int x2, int y2);
 };
 
 

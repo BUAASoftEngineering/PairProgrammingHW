@@ -5,6 +5,7 @@
 #include <iostream>
 #include "gtest/gtest.h"
 #include "Point.h"
+#include "Shapes.h"
 
 TEST(CoordinateTest, construct1) {
     Coordinate c(1, 2);
@@ -112,4 +113,69 @@ TEST(PointTest, construct) {
     std::ostringstream outstream;
     outstream << p;
     EXPECT_EQ(outstream.str(), "(3 / 4, 0.61602540)");
+}
+
+TEST(OnLineTest, Line) {
+    // y = 3x
+    Line line(-100000, -300000, 100000, 300000);
+    // (0, 0)
+    Coordinate x1(-0, 100);
+    Coordinate y1(4, -2, 4, -4);
+    bool res1 = line.checkPoint(x1, y1);
+    // (100000, 300000)
+    Coordinate x2(-100000, -1);
+    Coordinate y2(300000, 1);
+    bool res2 = line.checkPoint(x2, y2);
+    // (-100000, -300000)
+    Coordinate x3(100000, -1);
+    Coordinate y3(-300000, 1);
+    bool res3 = line.checkPoint(x3, y3);
+    // (1e-8, 3e-8)
+    Coordinate x4(1, 1e8);
+    Coordinate y4(-3, -1e8);
+    bool res4 = line.checkPoint(x4, y4);
+    EXPECT_TRUE(res1);
+    EXPECT_TRUE(res2);
+    EXPECT_TRUE(res3);
+    EXPECT_TRUE(res4);
+}
+
+TEST(OnLineTest, HalfLine) {
+    // y = 3x
+    HalfLine halfline(0, 0, 100000, 300000);
+    // (0, 0)
+    Coordinate x1(-0, 100);
+    Coordinate y1(4, -2, 4, -4);
+    bool res1 = halfline.checkPoint(x1, y1);
+    // (100000, 300000)
+    Coordinate x2(-100000, -1);
+    Coordinate y2(300000, 1);
+    bool res2 = halfline.checkPoint(x2, y2);
+    // (-100000, -300000)
+    Coordinate x3(100000, -1);
+    Coordinate y3(-300000, 1);
+    bool res3 = halfline.checkPoint(x3, y3);
+    // (1e-8, 3e-8)
+    Coordinate x4(1, 1e8);
+    Coordinate y4(-3, -1e8);
+    bool res4 = halfline.checkPoint(x4, y4);
+    // (-1e-8, -3e-8)
+    Coordinate x5(-1, 1e8);
+    Coordinate y5(3, -1e8);
+    bool res5 = halfline.checkPoint(x5, y5);
+    // (1e8, 3e8)
+    Coordinate x6(1e8, 1);
+    Coordinate y6(-3e8, -1);
+    bool res6 = halfline.checkPoint(x6, y6);
+    // (-1e8, -3e8)
+    Coordinate x7(-1e8, 1);
+    Coordinate y7(3e8, -1);
+    bool res7 = halfline.checkPoint(x7, y7);
+    EXPECT_TRUE(res1);
+    EXPECT_TRUE(res2);
+    EXPECT_TRUE(!res3);
+    EXPECT_TRUE(res4);
+    EXPECT_TRUE(!res5);
+    EXPECT_TRUE(res6);
+    EXPECT_TRUE(!res7);
 }
