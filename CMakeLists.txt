@@ -25,3 +25,12 @@ add_executable(TestShapes
         src/Point.cpp
         external/googletest)
 target_link_libraries(TestShapes gtest_main)
+
+if ("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
+        OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
+    message("Building with llvm Code Coverage Tools")
+    set(CMAKE_CXX_FLAGS "-fprofile-instr-generate -fcoverage-mapping")
+elseif (${CMAKE_COMPILER_IS_GNUCXX})
+    message("Building with gcov Code Coverage Tools")
+    set(CMAKE_CXX_FLAGS "--coverage")
+endif ()

@@ -2,7 +2,7 @@
 // Created by xiangweilai on 2020/3/7.
 //
 
-#include <iostream>
+#include <set>
 #include "gtest/gtest.h"
 #include "Point.h"
 #include "Shapes.h"
@@ -96,6 +96,7 @@ TEST(CoordinateTest, nan2) {
     std::ostringstream outstream;
     outstream << c;
     EXPECT_EQ(outstream.str(), "nan");
+    EXPECT_TRUE(c.isInf());
 }
 
 TEST(CoordinateTest, nan3) {
@@ -103,8 +104,80 @@ TEST(CoordinateTest, nan3) {
     std::ostringstream outstream;
     outstream << c;
     EXPECT_EQ(outstream.str(), "nan");
+    EXPECT_TRUE(c.isInf());
 }
 
+TEST(CoordinateTest, operator_smaller) {
+    Coordinate a(-1, 1e3);
+    Coordinate b(1, 1e3);
+    Coordinate c(-1, 1e8);
+    Coordinate d(1, 1e8);
+    Coordinate e(-0, 100);
+    EXPECT_TRUE(a < c && c < e && e < d && d < b);
+    Coordinate x(53315010, 1e8);
+    Coordinate z(-53315012, -1e8);
+    Coordinate i(2, 1, 3, 7);  // 0.533150115
+    Coordinate j(4, 3, 5, 20); // 0.535
+    Coordinate k(5, 3, 8, 25); // 0.539
+    EXPECT_TRUE(x < i && i < z && z < j && j < k);
+}
+
+TEST(CoordinateTest, operator_larger) {
+    Coordinate a(-1, 1e3);
+    Coordinate b(1, 1e3);
+    Coordinate c(-1, 1e8);
+    Coordinate d(1, 1e8);
+    Coordinate e(-0, 100);
+    EXPECT_TRUE(c > a && e > c && d > e && b > d);
+    Coordinate x(53315010, 1e8);
+    Coordinate z(-53315012, -1e8);
+    Coordinate i(2, 1, 3, 7);  // 0.533150115
+    Coordinate j(4, 3, 5, 20); // 0.535
+    Coordinate k(5, 3, 8, 25); // 0.539
+    EXPECT_TRUE(i > x && z > i && j > z && k > j);
+}
+
+TEST(CoordinateTest, operator_equal) {
+    Coordinate a(-1, 1e8);
+    Coordinate b(1, 1e8);
+    Coordinate c(-1, 1e3);
+    Coordinate d(1, 1e3);
+    Coordinate e(-0, 100);
+    EXPECT_FALSE(c == a || e == c || d == e || b == d);
+    Coordinate x(53315010, 1e8);
+    Coordinate z(-53315012, -1e8);
+    Coordinate i(2, 1, 3, 7);  // 0.533150115
+    Coordinate j(4, 3, 5, 20); // 0.535
+    Coordinate k(5, 3, 8, 25); // 0.539
+    EXPECT_FALSE(i == x || z == i || j == z || k == j);
+}
+
+TEST(CoordinateTest, hashCode) {
+    Coordinate a(-1, 1e8);
+    Coordinate b(1, 1e8);
+    Coordinate c(-1, 1e3);
+    Coordinate d(1, 1e3);
+    Coordinate e(-0, 100);
+    Coordinate x(53315010, 1e8);
+    Coordinate z(-53315012, -1e8);
+    Coordinate i(2, 1, 3, 7);  // 0.533150115
+    Coordinate j(4, 3, 5, 20); // 0.535
+    Coordinate k(5, 3, 8, 25); // 0.539
+    std::set<std::size_t> codes;
+    Coordinate arr[] = {a, b, c, d, e, x, z, i, j, k};
+    int count = 0, count1 = 0, count_rational = 0;
+    for (auto ele: arr) {
+        auto code = ele.hashCode();
+        codes.insert(code);
+        count++;
+        if ((code & 1u) == 1)
+            count1++;
+        if (ele.isRational)
+            count_rational++;
+    }
+    EXPECT_EQ(codes.size(), count);
+    EXPECT_EQ(count1, count_rational);
+}
 
 TEST(PointTest, construct) {
     Coordinate x(6, 8);
@@ -140,7 +213,7 @@ TEST(OnLineTest, Line) {
     EXPECT_TRUE(res4);
 }
 
-TEST(OnLineTest, HalfLine) {
+TEST(OnLineTest, HalfLine1) {
     // y = 3x
     Line halfline(0, 0, 100000, 300000, LineType::HALF_LINE);
     // (0, 0)
@@ -151,31 +224,271 @@ TEST(OnLineTest, HalfLine) {
     Coordinate x2(-100000, -1);
     Coordinate y2(300000, 1);
     bool res2 = halfline.checkPoint(x2, y2);
-    // (-100000, -300000)
-    Coordinate x3(100000, -1);
-    Coordinate y3(-300000, 1);
+    // (0-, )
+    Coordinate x3(1, -1e8);
+    Coordinate y3(-3, 1e8);
     bool res3 = halfline.checkPoint(x3, y3);
-    // (1e-8, 3e-8)
+    // (0+, )
     Coordinate x4(1, 1e8);
-    Coordinate y4(-3, -1e8);
+    Coordinate y4(3, 1e8);
     bool res4 = halfline.checkPoint(x4, y4);
-    // (-1e-8, -3e-8)
-    Coordinate x5(-1, 1e8);
-    Coordinate y5(3, -1e8);
+    // (100000-, )
+    Coordinate x5(100000 * 1e3 - 1, 1e3);
+    Coordinate y5(300000 * 1e3 - 3, 1e3);
     bool res5 = halfline.checkPoint(x5, y5);
-    // (1e8, 3e8)
-    Coordinate x6(1e8, 1);
-    Coordinate y6(-3e8, -1);
+    // (100000+, )
+    Coordinate x6(100000 * 1e3 + 1, 1e3);
+    Coordinate y6(300000 * 1e3 + 3, 1e3);
     bool res6 = halfline.checkPoint(x6, y6);
-    // (-1e8, -3e8)
-    Coordinate x7(-1e8, 1);
-    Coordinate y7(3e8, -1);
-    bool res7 = halfline.checkPoint(x7, y7);
     EXPECT_TRUE(res1);
     EXPECT_TRUE(res2);
     EXPECT_TRUE(!res3);
     EXPECT_TRUE(res4);
-    EXPECT_TRUE(!res5);
+    EXPECT_TRUE(res5);
     EXPECT_TRUE(res6);
-    EXPECT_TRUE(!res7);
+}
+
+TEST(OnLineTest, HalfLine2) {
+    // y = -3x
+    Line halfline(0, 0, 100000, -300000, LineType::HALF_LINE);
+    // (0, 0)
+    Coordinate x1(-0, 100);
+    Coordinate y1(4, -2, 4, -4);
+    bool res1 = halfline.checkPoint(x1, y1);
+    // (100000, -300000)
+    Coordinate x2(-100000, -1);
+    Coordinate y2(-300000, 1);
+    bool res2 = halfline.checkPoint(x2, y2);
+    // (0-, )
+    Coordinate x3(1, -1e8);
+    Coordinate y3(3, 1e8);
+    bool res3 = halfline.checkPoint(x3, y3);
+    // (0+, )
+    Coordinate x4(1, 1e8);
+    Coordinate y4(-3, 1e8);
+    bool res4 = halfline.checkPoint(x4, y4);
+    // (100000-, )
+    Coordinate x5(100000 * 1e3 - 1, 1e3);
+    Coordinate y5(-300000 * 1e3 + 3, 1e3);
+    bool res5 = halfline.checkPoint(x5, y5);
+    // (100000+, )
+    Coordinate x6(100000 * 1e3 + 1, 1e3);
+    Coordinate y6(-300000 * 1e3 - 3, 1e3);
+    bool res6 = halfline.checkPoint(x6, y6);
+    EXPECT_TRUE(res1);
+    EXPECT_TRUE(res2);
+    EXPECT_TRUE(!res3);
+    EXPECT_TRUE(res4);
+    EXPECT_TRUE(res5);
+    EXPECT_TRUE(res6);
+}
+
+TEST(OnLineTest, HalfLine3) {
+    // y = 3x， reverse
+    Line halfline(100000, 300000, 0, 0, LineType::HALF_LINE);
+    // (0, 0)
+    Coordinate x1(-0, 100);
+    Coordinate y1(4, -2, 4, -4);
+    bool res1 = halfline.checkPoint(x1, y1);
+    // (100000, 300000)
+    Coordinate x2(-100000, -1);
+    Coordinate y2(300000, 1);
+    bool res2 = halfline.checkPoint(x2, y2);
+    // (0-, )
+    Coordinate x3(1, -1e8);
+    Coordinate y3(-3, 1e8);
+    bool res3 = halfline.checkPoint(x3, y3);
+    // (0+, )
+    Coordinate x4(1, 1e8);
+    Coordinate y4(3, 1e8);
+    bool res4 = halfline.checkPoint(x4, y4);
+    // (100000-, )
+    Coordinate x5(100000 * 1e3 - 1, 1e3);
+    Coordinate y5(300000 * 1e3 - 3, 1e3);
+    bool res5 = halfline.checkPoint(x5, y5);
+    // (100000+, )
+    Coordinate x6(100000 * 1e3 + 1, 1e3);
+    Coordinate y6(300000 * 1e3 + 3, 1e3);
+    bool res6 = halfline.checkPoint(x6, y6);
+    EXPECT_TRUE(res1);
+    EXPECT_TRUE(res2);
+    EXPECT_TRUE(res3);
+    EXPECT_TRUE(res4);
+    EXPECT_TRUE(res5);
+    EXPECT_TRUE(!res6);
+}
+
+TEST(OnLineTest, HalfLine4) {
+    // y = -3x， reverse
+    Line halfline(100000, -300000, 0, 0, LineType::HALF_LINE);
+    // (0, 0)
+    Coordinate x1(-0, 100);
+    Coordinate y1(4, -2, 4, -4);
+    bool res1 = halfline.checkPoint(x1, y1);
+    // (100000, -300000)
+    Coordinate x2(-100000, -1);
+    Coordinate y2(-300000, 1);
+    bool res2 = halfline.checkPoint(x2, y2);
+    // (0-, )
+    Coordinate x3(1, -1e8);
+    Coordinate y3(3, 1e8);
+    bool res3 = halfline.checkPoint(x3, y3);
+    // (0+, )
+    Coordinate x4(1, 1e8);
+    Coordinate y4(-3, 1e8);
+    bool res4 = halfline.checkPoint(x4, y4);
+    // (100000-, )
+    Coordinate x5(100000 * 1e3 - 1, 1e3);
+    Coordinate y5(-300000 * 1e3 + 3, 1e3);
+    bool res5 = halfline.checkPoint(x5, y5);
+    // (100000+, )
+    Coordinate x6(100000 * 1e3 + 1, 1e3);
+    Coordinate y6(-300000 * 1e3 - 3, 1e3);
+    bool res6 = halfline.checkPoint(x6, y6);
+    EXPECT_TRUE(res1);
+    EXPECT_TRUE(res2);
+    EXPECT_TRUE(res3);
+    EXPECT_TRUE(res4);
+    EXPECT_TRUE(res5);
+    EXPECT_TRUE(!res6);
+}
+
+TEST(OnLineTest, Seg1) {
+    // y = 3x
+    Line seg(0, 0, 100000, 300000, LineType::SEGMENT_LINE);
+    // (0, 0)
+    Coordinate x1(-0, 100);
+    Coordinate y1(4, -2, 4, -4);
+    bool res1 = seg.checkPoint(x1, y1);
+    // (100000, 300000)
+    Coordinate x2(-100000, -1);
+    Coordinate y2(300000, 1);
+    bool res2 = seg.checkPoint(x2, y2);
+    // (0-, )
+    Coordinate x3(1, -1e8);
+    Coordinate y3(-3, 1e8);
+    bool res3 = seg.checkPoint(x3, y3);
+    // (0+, )
+    Coordinate x4(1, 1e8);
+    Coordinate y4(3, 1e8);
+    bool res4 = seg.checkPoint(x4, y4);
+    // (100000-, )
+    Coordinate x5(100000 * 1e3 - 1, 1e3);
+    Coordinate y5(300000 * 1e3 - 3, 1e3);
+    bool res5 = seg.checkPoint(x5, y5);
+    // (100000+, )
+    Coordinate x6(100000 * 1e3 + 1, 1e3);
+    Coordinate y6(300000 * 1e3 + 3, 1e3);
+    bool res6 = seg.checkPoint(x6, y6);
+    EXPECT_TRUE(res1);
+    EXPECT_TRUE(res2);
+    EXPECT_TRUE(!res3);
+    EXPECT_TRUE(res4);
+    EXPECT_TRUE(res5);
+    EXPECT_TRUE(!res6);
+}
+
+TEST(OnLineTest, Seg2) {
+    // y = -3x
+    Line seg(0, 0, 100000, -300000, LineType::SEGMENT_LINE);
+    // (0, 0)
+    Coordinate x1(-0, 100);
+    Coordinate y1(4, -2, 4, -4);
+    bool res1 = seg.checkPoint(x1, y1);
+    // (100000, -300000)
+    Coordinate x2(-100000, -1);
+    Coordinate y2(-300000, 1);
+    bool res2 = seg.checkPoint(x2, y2);
+    // (0-, )
+    Coordinate x3(1, -1e8);
+    Coordinate y3(3, 1e8);
+    bool res3 = seg.checkPoint(x3, y3);
+    // (0+, )
+    Coordinate x4(1, 1e8);
+    Coordinate y4(-3, 1e8);
+    bool res4 = seg.checkPoint(x4, y4);
+    // (100000-, )
+    Coordinate x5(100000 * 1e3 - 1, 1e3);
+    Coordinate y5(-300000 * 1e3 + 3, 1e3);
+    bool res5 = seg.checkPoint(x5, y5);
+    // (100000+, )
+    Coordinate x6(100000 * 1e3 + 1, 1e3);
+    Coordinate y6(-300000 * 1e3 - 3, 1e3);
+    bool res6 = seg.checkPoint(x6, y6);
+    EXPECT_TRUE(res1);
+    EXPECT_TRUE(res2);
+    EXPECT_TRUE(!res3);
+    EXPECT_TRUE(res4);
+    EXPECT_TRUE(res5);
+    EXPECT_TRUE(!res6);
+}
+
+TEST(OnLineTest, Seg3) {
+    // y = 3x， reverse
+    Line seg(100000, 300000, 0, 0, LineType::SEGMENT_LINE);
+    // (0, 0)
+    Coordinate x1(-0, 100);
+    Coordinate y1(4, -2, 4, -4);
+    bool res1 = seg.checkPoint(x1, y1);
+    // (100000, 300000)
+    Coordinate x2(-100000, -1);
+    Coordinate y2(300000, 1);
+    bool res2 = seg.checkPoint(x2, y2);
+    // (0-, )
+    Coordinate x3(1, -1e8);
+    Coordinate y3(-3, 1e8);
+    bool res3 = seg.checkPoint(x3, y3);
+    // (0+, )
+    Coordinate x4(1, 1e8);
+    Coordinate y4(3, 1e8);
+    bool res4 = seg.checkPoint(x4, y4);
+    // (100000-, )
+    Coordinate x5(100000 * 1e3 - 1, 1e3);
+    Coordinate y5(300000 * 1e3 - 3, 1e3);
+    bool res5 = seg.checkPoint(x5, y5);
+    // (100000+, )
+    Coordinate x6(100000 * 1e3 + 1, 1e3);
+    Coordinate y6(300000 * 1e3 + 3, 1e3);
+    bool res6 = seg.checkPoint(x6, y6);
+    EXPECT_TRUE(res1);
+    EXPECT_TRUE(res2);
+    EXPECT_TRUE(!res3);
+    EXPECT_TRUE(res4);
+    EXPECT_TRUE(res5);
+    EXPECT_TRUE(!res6);
+}
+
+TEST(OnLineTest, Seg4) {
+    // y = -3x， reverse
+    Line seg(100000, -300000, 0, 0, LineType::SEGMENT_LINE);
+    // (0, 0)
+    Coordinate x1(-0, 100);
+    Coordinate y1(4, -2, 4, -4);
+    bool res1 = seg.checkPoint(x1, y1);
+    // (100000, -300000)
+    Coordinate x2(-100000, -1);
+    Coordinate y2(-300000, 1);
+    bool res2 = seg.checkPoint(x2, y2);
+    // (0-, )
+    Coordinate x3(1, -1e8);
+    Coordinate y3(3, 1e8);
+    bool res3 = seg.checkPoint(x3, y3);
+    // (0+, )
+    Coordinate x4(1, 1e8);
+    Coordinate y4(-3, 1e8);
+    bool res4 = seg.checkPoint(x4, y4);
+    // (100000-, )
+    Coordinate x5(100000 * 1e3 - 1, 1e3);
+    Coordinate y5(-300000 * 1e3 + 3, 1e3);
+    bool res5 = seg.checkPoint(x5, y5);
+    // (100000+, )
+    Coordinate x6(100000 * 1e3 + 1, 1e3);
+    Coordinate y6(-300000 * 1e3 - 3, 1e3);
+    bool res6 = seg.checkPoint(x6, y6);
+    EXPECT_TRUE(res1);
+    EXPECT_TRUE(res2);
+    EXPECT_TRUE(!res3);
+    EXPECT_TRUE(res4);
+    EXPECT_TRUE(res5);
+    EXPECT_TRUE(!res6);
 }

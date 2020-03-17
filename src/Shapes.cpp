@@ -132,24 +132,22 @@ bool checkPointHalf(const Coordinate &x, const Coordinate &y,
     Coordinate xc2(line.p2_x, 1);
     Coordinate yc2(line.p2_y, 1);
 
+    bool x_check = false, y_check = false;
+
     if ((x < xc1 || x == xc1) && (xc2 < xc1 || xc2 == xc1)) {
-        return true;
+        x_check = true;
     }
     if ((x > xc1 || x == xc1) && (xc2 > xc1 || xc2 == xc1)) {
-        return true;
+        x_check = true;
     }
     if ((y < yc1 || y == yc1) && (yc2 < yc1 || yc2 == yc1)) {
-        return true;
+        y_check = true;
     }
     if ((y > yc1 || y == yc1) && (yc2 > yc1 || yc2 == yc1)) {
-        return true;
+        y_check = true;
     }
-    return false;
+    return x_check & y_check;
 }
-
-//HalfLine::HalfLine(int x1, int y1, int x2, int y2) : Line(x1, y1, x2, y2) {}
-//
-//SegmentLine::SegmentLine(int x1, int y1, int x2, int y2) : Line(x1, y1, x2, y2) {}
 
 bool checkPointSegment(const Coordinate &x, const Coordinate &y,
                        const Line &line) {
@@ -158,17 +156,19 @@ bool checkPointSegment(const Coordinate &x, const Coordinate &y,
     Coordinate xc2(line.p2_x, 1);
     Coordinate yc2(line.p2_y, 1);
 
+    bool x_check = false, y_check = false;
+
     if ((x < xc1 || x == xc1) && (xc2 < x || xc2 == x)) {
-        return true;
+        x_check = true;
     }
     if ((x > xc1 || x == xc1) && (xc2 > x || xc2 == x)) {
-        return true;
+        x_check = true;
     }
     if ((y < yc1 || y == yc1) && (yc2 < y || yc2 == y)) {
-        return true;
+        y_check = true;
     }
     if ((y > yc1 || y == yc1) && (yc2 > y || yc2 == y)) {
-        return true;
+        y_check = true;
     }
-    return false;
+    return x_check & y_check;
 }
