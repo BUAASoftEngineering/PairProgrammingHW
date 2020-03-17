@@ -7,7 +7,7 @@
 Line::Line(int x1, int y1, int x2, int y2) : p1_x(x1), p1_y(y1), p2_x(x2), p2_y(y2),
                                              type(LineType::LINE) {}
 
-Line::Line(int x1, int y1, int x2, int y2, int type) :
+Line::Line(int x1, int y1, int x2, int y2, LineType type) :
         p1_x(x1), p1_y(y1), p2_x(x2), p2_y(y2), type(type) {}
 
 bool Line::checkPoint(const Coordinate &x, const Coordinate &y) const {
@@ -23,7 +23,7 @@ bool Line::checkPoint(const Coordinate &x, const Coordinate &y) const {
 Circle::Circle(int x, int y, int r) : center_x(x), center_y(y), radius(r) {}
 
 
-std::vector<Point> intersection(Line a, Circle b) {
+std::vector<Point> intersection(const Line &a, const Circle &b) {
 //    std::cout << "Line - Circle!\n";
     std::vector<Point> container;
     // https://mathworld.wolfram.com/Circle-LineIntersection.html
@@ -65,12 +65,12 @@ std::vector<Point> intersection(Line a, Circle b) {
     }
 }
 
-std::vector<Point> intersection(Circle a, Line b) {
+std::vector<Point> intersection(const Circle &a, const Line &b) {
 //    std::cout << "Circle - Line!\n";
     return intersection(b, a);
 }
 
-std::vector<Point> intersection(Line a, Line b) {
+std::vector<Point> intersection(const Line &a, const Line &b) {
     std::vector<Point> container;
     // https://en.wikipedia.org/wiki/Line–line_intersection
 //    std::cout << "Line - Line!\n";
@@ -92,7 +92,7 @@ std::vector<Point> intersection(Line a, Line b) {
     }
 }
 
-std::vector<Point> intersection(Circle a, Circle b) {
+std::vector<Point> intersection(const Circle &a, const Circle &b) {
     std::vector<Point> container;
 //    std::cout << "Circle - Circle!\n";
     ll x1 = a.center_x, y1 = a.center_y, r1 = a.radius;

@@ -93,9 +93,9 @@ bool Coordinate::operator<(const Coordinate &other) const {
 
 bool Coordinate::operator==(const Coordinate &other) const {
     if (isRational) {
-        return (other.isRational & (top == other.top) & (bottom == other.bottom));
+        return (other.isRational && (top == other.top) && (bottom == other.bottom));
     } else {
-        return ((!other.isRational) & ((long long) (value * 1e8) == (long long) (other.value * 1e8)));
+        return ((!other.isRational) && ((long long) (value * 1e8) == (long long) (other.value * 1e8)));
     }
 }
 

@@ -11,20 +11,20 @@
 #include "Point.h"
 
 enum LineType {
-    LINE = 0,
-    HALF_LINE = 1,
-    SEGMENT_LINE = 2
+    LINE,
+    HALF_LINE,
+    SEGMENT_LINE,
 };
 
 class Line {
 public:
     Line(int x1, int y1, int x2, int y2);
 
-    Line(int x1, int y1, int x2, int y2, int type);
+    Line(int x1, int y1, int x2, int y2, LineType type);
 
     int p1_x, p1_y;
     int p2_x, p2_y;
-    int type;
+    LineType type;
 
     virtual bool checkPoint(const Coordinate &x, const Coordinate &y) const;
 };
@@ -35,21 +35,6 @@ bool checkPointHalf(const Coordinate &x, const Coordinate &y,
 bool checkPointSegment(const Coordinate &x, const Coordinate &y,
                        const Line &line);
 
-//class HalfLine: public Line {
-//public:
-//    bool checkPoint(Coordinate x, Coordinate y) const override ;
-//
-//    HalfLine(int x1, int y1, int x2, int y2);
-//};
-//
-//class SegmentLine: public Line {
-//public:
-//    bool checkPoint(Coordinate x, Coordinate y) const override ;
-//
-//    SegmentLine(int x1, int y1, int x2, int y2);
-//};
-
-
 
 class Circle {
 public:
@@ -59,13 +44,13 @@ public:
     int radius;
 };
 
-std::vector<Point> intersection(Line x, Circle y);
+std::vector<Point> intersection(const Line &a, const Circle &b);
 
-std::vector<Point> intersection(Circle x, Line y);
+std::vector<Point> intersection(const Circle &a, const Line &b);
 
-std::vector<Point> intersection(Line x, Line y);
+std::vector<Point> intersection(const Line &a, const Line &b);
 
-std::vector<Point> intersection(Circle x, Circle y);
+std::vector<Point> intersection(const Circle &a, const Circle &b);
 
 ll square(ll x);
 
