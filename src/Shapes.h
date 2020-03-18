@@ -18,6 +18,8 @@ enum LineType {
 
 class Line {
 public:
+    Line() : Line(0, 0, 0, 0) {}
+
     Line(int x1, int y1, int x2, int y2);
 
     Line(int x1, int y1, int x2, int y2, LineType type);

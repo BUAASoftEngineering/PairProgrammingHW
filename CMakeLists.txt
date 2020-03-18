@@ -34,6 +34,14 @@ add_executable(TestShapes
         external/googletest)
 target_link_libraries(TestShapes gtest_main)
 
+# Test: core module (libgeometry)
+add_executable(TestCore
+        test/testCore.cpp
+        external/googletest)
+target_link_libraries(TestCore gtest_main)
+target_link_libraries(TestCore libgeometry)
+
+
 if ("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
         OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
     message("Building with llvm Code Coverage Tools")

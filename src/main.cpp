@@ -1,7 +1,4 @@
 #include <iostream>
-#include <cstring>
-#include <unordered_set>
-#include "Shapes.h"
 #include "interface.h"
 
 int main(int argc, char *argv[]) {
@@ -17,19 +14,23 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // init instance
-    auto *inst = init_geo_instance();
-    int err = addBatchFromFile(inst, filein, nullptr, nullptr);
-    if(err != ERROR_CODE::SUCCESS){
+    // create manager
+    auto *manager = createManager();
+
+    // add Geometry Shapes From File
+    ERROR_CODE err = addShapesBatch(manager, filein, nullptr, nullptr);
+    if (err != ERROR_CODE::SUCCESS) {
         std::cout << "ERROR: " << err << std::endl;
     }
 
-    int objCount = getNumIntersection(inst);
-    std::cout << objCount << std::endl;
+    int intersectionsCount = getIntersectionsCount(manager);
     if (fileout) {
-        fprintf(fileout, "%d", objCount);
+        fprintf(fileout, "%d\n", intersectionsCount);
+    } else {
+        printf("%d\n", intersectionsCount);
     }
 
-    close_geo_instance(inst);
+    // close manager
+    closeManager(manager);
     return 0;
 }

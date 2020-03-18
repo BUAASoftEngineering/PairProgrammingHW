@@ -42,6 +42,7 @@
 out
 gen
 cmake-build-debug
+cmake-build-release
 
 # Google Test directory
 # external/googletest/

@@ -8,27 +8,35 @@
 #include <unordered_set>
 #include "Shapes.h"
 
+
 enum ERROR_CODE {
-    SUCCESS, ERR_INVALID_OBJECT, ERR_INVALID_OBJ_ARGUMENT
+    SUCCESS, INVALID_SHAPE, INTERSECTION_EXCP, INVALID_INPUT,
 };
 
-struct geo_mgr_t {
-    std::vector<Geometry> *objs;
-    std::unordered_set<Point, hashCode_Point, equals_Point> *point_set;
+struct gManager {
+    std::vector<Geometry> *shapes;
+    std::unordered_set<Point, hashCode_Point, equals_Point> *points;
 };
 
-geo_mgr_t *init_geo_instance() {
-    auto *inst = new geo_mgr_t;
-    inst->objs = new std::vector<Geometry>();
-    inst->point_set = new std::unordered_set<Point, hashCode_Point, equals_Point>();
+
+gManager *createManager() {
+    auto *inst = new gManager;
+    inst->shapes = new std::vector<Geometry>();
+    inst->points = new std::unordered_set<Point, hashCode_Point, equals_Point>();
     return inst;
 }
 
-void close_geo_instance(geo_mgr_t *inst) {
-    delete inst->objs;
-    delete inst->point_set;
+void closeManager(gManager *inst) {
+    delete inst->shapes;
+    delete inst->points;
     delete inst;
 }
+
+void cleanManager(gManager *inst) {
+    inst->shapes->clear();
+    inst->points->clear();
+}
+
 
 void _pushPoint(double *buf, const Point &point, int &pos) {
     auto &x = point.x;
@@ -60,10 +68,11 @@ void _pushPoint(double *buf, const Point &point, int &pos) {
  * @param posBuf
  * @return
  */
-int add(geo_mgr_t *inst, char objType, int x1, int y1, int x2, int y2,
-        double *buf, int *posBuf) {
-    auto *objs = inst->objs;
-    Geometry obj = Line(0, 0, 0, 0);
+ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2,
+                    double *buf, int *posBuf) {
+    Geometry obj = Line();
+
+    // TODO: ERROR_CODE::INVALID_SHAPE (objType, x1, y1, x2, y2 check!!!)
     if (objType == 'L') {
         obj = Line(x1, y1, x2, y2);
     } else if (objType == 'C') {
@@ -73,19 +82,21 @@ int add(geo_mgr_t *inst, char objType, int x1, int y1, int x2, int y2,
     } else if (objType == 'S') {
         obj = Line(x1, y1, x2, y2, LineType::SEGMENT_LINE);
     } else {
-        return ERROR_CODE::ERR_INVALID_OBJ_ARGUMENT;
+        return ERROR_CODE::INVALID_SHAPE;
     }
-    for (auto &objExist :*objs) {
+
+    for (auto &objExist : *inst->shapes) {
+        // TODO: ERROR_CODE::INTERSECTION_EXCP (parallel / overlap lines check!!!)
         std::vector<Point> intersections =
                 std::visit(interset_visitor{}, obj, objExist);
-        for (Point p: intersections) {
-            inst->point_set->insert(p);
-            if (buf) {
-                _pushPoint(buf, p, *posBuf);
+        for (auto &p: intersections) {
+            if (buf && inst->points->count(p) == 0) {
+                _pushPoint(buf, p, *posBuf);  // increment --> points already exist shouldn't be returned
             }
+            inst->points->insert(p);
         }
     }
-    inst->objs->push_back(obj);
+    inst->shapes->push_back(obj);
     return ERROR_CODE::SUCCESS;
 }
 
@@ -97,7 +108,8 @@ int add(geo_mgr_t *inst, char objType, int x1, int y1, int x2, int y2,
  * @param posBuf
  * @return
  */
-int addBatchFromFile(geo_mgr_t *inst, FILE *inputFile, double *buf, int *posBuf) {
+ERROR_CODE addShapesBatch(gManager *inst, FILE *inputFile, double *buf, int *posBuf) {
+    // TODO: ERROR_CODE::INVALID_INPUT check (encapsulate a "TRY_READ_LINE" function for stdin/filein/GUIin !!!)
     int objCount;
     if (inputFile) {
         fscanf(inputFile, "%d", &objCount);
@@ -131,23 +143,21 @@ int addBatchFromFile(geo_mgr_t *inst, FILE *inputFile, double *buf, int *posBuf)
                 scanf("%d%d%d%d", &x1, &y1, &x2, &y2);
             }
         }
-        int err = add(inst, objType, x1, y1, x2, y2, buf, posBuf);
-        if (err != ERROR_CODE::SUCCESS) {
-            return err;
-        }
+        ERROR_CODE status = addShape(inst, objType, x1, y1, x2, y2, buf, posBuf);
+        if (status != ERROR_CODE::SUCCESS)
+            return status;
     }
     return ERROR_CODE::SUCCESS;
 }
 
-int getNumIntersection(geo_mgr_t *inst) {
-    return inst->point_set->size();
+
+int getIntersectionsCount(gManager *inst) {
+    return inst->points->size();
 }
 
-
-void getIntersections(geo_mgr_t *inst, double *buf) {
-    auto *pset = inst->point_set;
+void getIntersections(gManager *inst, double *buf) {
     int pos = 0;
-    for (auto &point: *pset) {
+    for (auto &point: *inst->points) {
         _pushPoint(buf, point, pos);
     }
 }
