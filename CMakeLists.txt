@@ -9,7 +9,7 @@ project(Geometry)
 set(CMAKE_CXX_STANDARD 17)
 set(GOOGLETEST_VERSION 1.10.0) # from googletest-master/CML.txt
 
-add_library(libgeometry SHARED src/Point.cpp src/Point.h src/Shapes.cpp src/Shapes.h)
+add_library(libgeometry SHARED src/Point.cpp src/Point.h src/Shapes.cpp src/Shapes.h src/interface.h)
 add_executable(Geometry src/main.cpp) # main
 link_directories(${PROJECT_SOURCE_DIR})
 target_link_libraries(Geometry libgeometry)

@@ -2,54 +2,34 @@
 #include <cstring>
 #include <unordered_set>
 #include "Shapes.h"
+#include "interface.h"
 
 int main(int argc, char *argv[]) {
     // handle arguments & freopen
+    FILE *filein = nullptr;
+    FILE *fileout = nullptr;
     for (int i = 0; i < argc; ++i) {
         if (strcmp(argv[i], "-i") == 0) {
-            freopen(argv[i + 1], "r", stdin);
+            filein = fopen(argv[i + 1], "r");
         }
         if (strcmp(argv[i], "-o") == 0) {
-            freopen(argv[i + 1], "w", stdout);
+            fileout = fopen(argv[i + 1], "w");
         }
     }
 
-    // main content
-    int objCount;
-    std::cin >> objCount;
-    auto *objs = new std::vector<Geometry>();
-
-    // temp vars for input
-    char objType;
-    int x1, y1, x2, y2;
-
-    for (int i = 0; i < objCount; ++i) {
-        std::cin >> objType;
-        if (objType == 'L') {
-            scanf("%d%d%d%d", &x1, &y1, &x2, &y2);
-            objs->emplace_back(Line(x1, y1, x2, y2));
-        } else if (objType == 'C') {
-            scanf("%d%d%d", &x1, &y1, &x2);
-            objs->emplace_back(Circle(x1, y1, x2));
-        } else if (objType == 'R') {
-            scanf("%d%d%d%d", &x1, &y1, &x2, &y2);
-            objs->emplace_back(Line(x1, y1, x2, y2, LineType::HALF_LINE));
-        } else if (objType == 'S') {
-            scanf("%d%d%d%d", &x1, &y1, &x2, &y2);
-            objs->emplace_back(Line(x1, y1, x2, y2, LineType::SEGMENT_LINE));
-        } else
-            continue;
+    // init instance
+    auto *inst = init_geo_instance();
+    int err = addBatchFromFile(inst, filein, nullptr, nullptr);
+    if(err != ERROR_CODE::SUCCESS){
+        std::cout << "ERROR: " << err << std::endl;
     }
 
-    objCount = objs->size();
-    std::unordered_set<Point, hashCode_Point, equals_Point> container;
-    for (int i = 0; i < objCount; ++i) {
-        for (int j = i + 1; j < objCount; ++j) {
-            std::vector<Point> intersections = std::visit(interset_visitor{}, (*objs)[i], (*objs)[j]);
-            for (Point p: intersections)
-                container.insert(p);
-        }
+    int objCount = getNumIntersection(inst);
+    std::cout << objCount << std::endl;
+    if (fileout) {
+        fprintf(fileout, "%d", objCount);
     }
-    std::cout << container.size() << std::endl;
+
+    close_geo_instance(inst);
     return 0;
 }
