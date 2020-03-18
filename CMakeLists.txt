@@ -1,10 +1,18 @@
 cmake_minimum_required(VERSION 3.15)
+
+# export .dll.a to dynamic .lib
+# see https://cmake.org/cmake/help/v3.1/prop_tgt/GNUtoMS.html
+set(CMAKE_GNUtoMS on)
+
 project(Geometry)
 
 set(CMAKE_CXX_STANDARD 17)
 set(GOOGLETEST_VERSION 1.10.0) # from googletest-master/CML.txt
 
-add_executable(Geometry src/main.cpp src/Point.cpp src/Point.h src/Shapes.cpp src/Shapes.h) # main
+add_library(libgeometry SHARED src/Point.cpp src/Point.h src/Shapes.cpp src/Shapes.h)
+add_executable(Geometry src/main.cpp) # main
+link_directories(${PROJECT_SOURCE_DIR})
+target_link_libraries(Geometry libgeometry)
 
 add_subdirectory(external/googletest)
 include_directories(src

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 #include <unordered_set>
 #include "Shapes.h"
 
