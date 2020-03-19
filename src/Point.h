@@ -12,7 +12,6 @@
 
 typedef long long ll;
 const int PRECISION = 6;
-const double REV_EPS = 1e6;
 
 class Coordinate {
 public:
@@ -31,7 +30,7 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const Coordinate &coordinate);
 
     std::size_t hashCode() const {
-        return std::hash<long long>{}((long long) (value * REV_EPS));
+        return std::hash<double>{}(value);
     }
 };
 
