@@ -12,7 +12,6 @@
 
 typedef long long ll;
 const int PRECISION = 6;
-const double EPS = 1e-6;
 const double REV_EPS = 1e6;
 
 class Coordinate {

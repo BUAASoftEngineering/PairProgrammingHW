@@ -3,6 +3,7 @@
 //
 
 #include "Point.h"
+#include <limits>
 
 
 Coordinate::Coordinate(double v_double) : value(v_double) {}
@@ -12,8 +13,11 @@ std::ostream &operator<<(std::ostream &os, const Coordinate &coordinate) {
     return os;
 }
 
+// https://zh.cppreference.com/w/cpp/types/numeric_limits/epsilon
+
 bool Coordinate::operator<(const Coordinate &other) const {
-    return value + EPS < other.value;
+    return other.value - value > std::numeric_limits<double>::epsilon() * std::abs(value + other.value)
+           || other.value - value > std::numeric_limits<double>::min();
 }
 
 bool Coordinate::operator==(const Coordinate &other) const {
@@ -21,7 +25,8 @@ bool Coordinate::operator==(const Coordinate &other) const {
 }
 
 bool Coordinate::operator>(const Coordinate &other) const {
-    return value > EPS + other.value;
+    return value - other.value > std::numeric_limits<double>::epsilon() * std::abs(value + other.value)
+           || value - other.value > std::numeric_limits<double>::min();
 }
 
 
