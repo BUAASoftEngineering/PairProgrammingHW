@@ -15,7 +15,7 @@ TEST(IntersectionTest, line_line1) {
     Point point = result[0];
     std::ostringstream outstream;
     outstream << point;
-    EXPECT_EQ(outstream.str(), "(0 / 1, 0 / 1)");
+    EXPECT_EQ(outstream.str(), "(0.000000, 0.000000)");
 }
 
 TEST(IntersectionTest, line_line2) {
@@ -27,7 +27,7 @@ TEST(IntersectionTest, line_line2) {
     Point point = result[0];
     std::ostringstream outstream;
     outstream << point;
-    EXPECT_EQ(outstream.str(), "(-2 / 11, -2 / 11)");
+    EXPECT_EQ(outstream.str(), "(-0.181818, -0.181818)");
 }
 
 TEST(IntersectionTest, line_line3) {
@@ -39,7 +39,7 @@ TEST(IntersectionTest, line_line3) {
     Point point = result[0];
     std::ostringstream outstream;
     outstream << point;
-    EXPECT_EQ(outstream.str(), "(100000 / 1, 100000 / 1)");
+    EXPECT_EQ(outstream.str(), "(100000.000000, 100000.000000)");
 }
 
 TEST(IntersectionTest, line_line4) {
@@ -51,7 +51,7 @@ TEST(IntersectionTest, line_line4) {
     Point point = result[0];
     std::ostringstream outstream;
     outstream << point;
-    EXPECT_EQ(outstream.str(), "(-100000 / 1, -100000 / 1)");
+    EXPECT_EQ(outstream.str(), "(-100000.000000, -100000.000000)");
 }
 
 TEST(IntersectionTest, line_line5) {
@@ -63,7 +63,7 @@ TEST(IntersectionTest, line_line5) {
     Point point = result[0];
     std::ostringstream outstream;
     outstream << point;
-    EXPECT_EQ(outstream.str(), "(-10 / 1, 0 / 1)");
+    EXPECT_EQ(outstream.str(), "(-10.000000, 0.000000)");
 }
 
 TEST(IntersectionTest, line_line6) {
@@ -99,7 +99,7 @@ TEST(IntersectionTest, line_line9) {
     Point point = result[0];
     std::ostringstream outstream;
     outstream << point;
-    EXPECT_EQ(outstream.str(), "(-14792987 / 37421, -15881976 / 37421)");
+    EXPECT_EQ(outstream.str(), "(-395.312445, -424.413458)");
 }
 
 
@@ -116,8 +116,8 @@ TEST(IntersectionTest, line_circle1) {
     Circle circle(0, 0, 1);
     auto result = intersection(line, circle);
     EXPECT_EQ(result.size(), 2);
-    EXPECT_EQ(getOutput(result[0]), "(0 / 1, 1 / 1)");
-    EXPECT_EQ(getOutput(result[1]), "(0 / 1, -1 / 1)");
+    EXPECT_EQ(getOutput(result[0]), "(0.000000, 1.000000)");
+    EXPECT_EQ(getOutput(result[1]), "(0.000000, -1.000000)");
 }
 
 TEST(IntersectionTest, line_circle2) {
@@ -126,8 +126,8 @@ TEST(IntersectionTest, line_circle2) {
     Circle circle(0, 0, 1);
     auto result = intersection(circle, line);
     EXPECT_EQ(result.size(), 2);
-    EXPECT_EQ(getOutput(result[0]), "(1 / 1, 0 / 1)");
-    EXPECT_EQ(getOutput(result[1]), "(-1 / 1, 0 / 1)");
+    EXPECT_EQ(getOutput(result[0]), "(1.000000, 0.000000)");
+    EXPECT_EQ(getOutput(result[1]), "(-1.000000, 0.000000)");
 }
 
 TEST(IntersectionTest, line_circle3) {
@@ -136,8 +136,8 @@ TEST(IntersectionTest, line_circle3) {
     Circle circle(0, 0, 1);
     auto result = intersection(line, circle);
     EXPECT_EQ(result.size(), 2);
-    EXPECT_EQ(getOutput(result[0]), "(0.70710678, 0.70710678)");
-    EXPECT_EQ(getOutput(result[1]), "(-0.70710678, -0.70710678)");
+    EXPECT_EQ(getOutput(result[0]), "(0.707107, 0.707107)");
+    EXPECT_EQ(getOutput(result[1]), "(-0.707107, -0.707107)");
 }
 
 TEST(IntersectionTest, line_circle4) {
@@ -146,8 +146,8 @@ TEST(IntersectionTest, line_circle4) {
     Circle circle(0, 0, 1);
     auto result = intersection(circle, line);
     EXPECT_EQ(result.size(), 2);
-    EXPECT_EQ(getOutput(result[0]), "(0 / 1, 1 / 1)");
-    EXPECT_EQ(getOutput(result[1]), "(-1 / 1, 0 / 1)");
+    EXPECT_EQ(getOutput(result[0]), "(0.000000, 1.000000)");
+    EXPECT_EQ(getOutput(result[1]), "(-1.000000, 0.000000)");
 }
 
 TEST(IntersectionTest, line_circle5) {
@@ -156,8 +156,8 @@ TEST(IntersectionTest, line_circle5) {
     Circle circle(0, 0, 1);
     auto result = intersection(line, circle);
     EXPECT_EQ(result.size(), 2);
-    EXPECT_EQ(getOutput(result[0]), "(4 / 5, 3 / 5)");
-    EXPECT_EQ(getOutput(result[1]), "(0 / 1, -1 / 1)");
+    EXPECT_EQ(getOutput(result[0]), "(0.800000, 0.600000)");
+    EXPECT_EQ(getOutput(result[1]), "(0.000000, -1.000000)");
 }
 
 TEST(IntersectionTest, line_circle6) {
@@ -166,7 +166,7 @@ TEST(IntersectionTest, line_circle6) {
     Circle circle(0, 0, 1);
     auto result = intersection(circle, line);
     EXPECT_EQ(result.size(), 1);
-    EXPECT_EQ(getOutput(result[0]), "(0 / 1, 1 / 1)");
+    EXPECT_EQ(getOutput(result[0]), "(0.000000, 1.000000)");
 }
 
 TEST(IntersectionTest, line_circle7) {
@@ -175,7 +175,7 @@ TEST(IntersectionTest, line_circle7) {
     Circle circle(0, 0, 1);
     auto result = intersection(line, circle);
     EXPECT_EQ(result.size(), 1);
-    EXPECT_EQ(getOutput(result[0]), "(-1 / 1, 0 / 1)");
+    EXPECT_EQ(getOutput(result[0]), "(-1.000000, 0.000000)");
 }
 
 TEST(IntersectionTest, line_circle8) {
@@ -184,8 +184,8 @@ TEST(IntersectionTest, line_circle8) {
     Circle circle(-17, 4, 20);
     auto result = intersection(circle, line);
     EXPECT_EQ(result.size(), 2);
-    EXPECT_EQ(getOutput(result[0]), "(-5.30910751, 20.22723121)");
-    EXPECT_EQ(getOutput(result[1]), "(-19.72537524, -15.81343811)");
+    EXPECT_EQ(getOutput(result[0]), "(-5.309108, 20.227231)");
+    EXPECT_EQ(getOutput(result[1]), "(-19.725375, -15.813438)");
 }
 
 TEST(IntersectionTest, line_circle9) {
@@ -220,7 +220,7 @@ TEST(IntersectionTest, circle_circle3) {
     Circle circle2(0, 2, 1);
     auto result = intersection(circle1, circle2);
     EXPECT_EQ(result.size(), 1);
-    EXPECT_EQ(getOutput(result[0]), "(0 / 1, 3 / 1)");
+    EXPECT_EQ(getOutput(result[0]), "(0.000000, 3.000000)");
 }
 
 TEST(IntersectionTest, circle_circle4) {
@@ -229,7 +229,7 @@ TEST(IntersectionTest, circle_circle4) {
     Circle circle2(3, 0, 2);
     auto result = intersection(circle1, circle2);
     EXPECT_EQ(result.size(), 1);
-    EXPECT_EQ(getOutput(result[0]), "(9 / 5, 8 / 5)");
+    EXPECT_EQ(getOutput(result[0]), "(1.800000, 1.600000)");
 }
 
 TEST(IntersectionTest, circle_circle5) {
@@ -238,8 +238,8 @@ TEST(IntersectionTest, circle_circle5) {
     Circle circle2(3, 2, 6);
     auto result = intersection(circle1, circle2);
     EXPECT_EQ(result.size(), 2);
-    EXPECT_EQ(getOutput(result[0]), "(3 / 1, -4 / 1)");
-    EXPECT_EQ(getOutput(result[1]), "(-33 / 13, 56 / 13)");
+    EXPECT_EQ(getOutput(result[0]), "(3.000000, -4.000000)");
+    EXPECT_EQ(getOutput(result[1]), "(-2.538462, 4.307692)");
 }
 
 TEST(IntersectionTest, circle_circle6) {
@@ -248,6 +248,6 @@ TEST(IntersectionTest, circle_circle6) {
     Circle circle2(-1, 1, 6);
     auto result = intersection(circle1, circle2);
     EXPECT_EQ(result.size(), 2);
-    EXPECT_EQ(getOutput(result[0]), "(3.42988133, -3.04674578)");
-    EXPECT_EQ(getOutput(result[1]), "(1.03165713, -4.64556191)");
+    EXPECT_EQ(getOutput(result[0]), "(3.429881, -3.046746)");
+    EXPECT_EQ(getOutput(result[1]), "(1.031657, -4.645562)");
 }

@@ -39,21 +39,8 @@ void cleanManager(gManager *inst) {
 
 
 void _pushPoint(double *buf, const Point &point, int &pos) {
-    auto &x = point.x;
-    auto &y = point.y;
-    double xVal, yVal;
-    if (x.isRational) {
-        xVal = (double) x.top / x.bottom;
-    } else {
-        xVal = x.value;
-    }
-    if (y.isRational) {
-        yVal = (double) y.top / y.bottom;
-    } else {
-        yVal = y.value;
-    }
-    buf[pos++] = xVal;
-    buf[pos++] = yVal;
+    buf[pos++] = point.x.value;
+    buf[pos++] = point.y.value;
 }
 
 /**
