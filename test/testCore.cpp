@@ -183,11 +183,27 @@ TEST(CoreTest, addFromStd_or_File_getCount) {
     closeManager(mng);
 }
 
-TEST(CoreTest, precision) {
+TEST(CoreTest, precision1) {
     gManager *mng = createManager();
     FILE *filein = fopen("../data/9423886.txt", "r");
     EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 9423886);
+    closeManager(mng);
+}
+
+TEST(CoreTest, precision2) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/4.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(getIntersectionsCount(mng), 4);
+    closeManager(mng);
+}
+
+TEST(CoreTest, precision3) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/26.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(getIntersectionsCount(mng), 26);
     closeManager(mng);
 }
 

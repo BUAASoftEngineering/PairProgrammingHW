@@ -13,11 +13,12 @@ std::ostream &operator<<(std::ostream &os, const Coordinate &coordinate) {
     return os;
 }
 
-// https://zh.cppreference.com/w/cpp/types/numeric_limits/epsilon
+// suppose that for 1.0, eps = BASE_EPS
+// then for 100.0, eps = BASE_EPS * 10^2
+// then for 10000.0, eps = BASE_EPS * 10^4
 
 bool Coordinate::operator<(const Coordinate &other) const {
-    return other.value - value > std::numeric_limits<double>::epsilon() * std::abs(value + other.value)
-           || other.value - value > std::numeric_limits<double>::min();
+    return other.value - value > BASE_EPS * std::max(1.0, std::min(std::abs(value), std::abs(other.value)));
 }
 
 bool Coordinate::operator==(const Coordinate &other) const {
@@ -25,8 +26,7 @@ bool Coordinate::operator==(const Coordinate &other) const {
 }
 
 bool Coordinate::operator>(const Coordinate &other) const {
-    return value - other.value > std::numeric_limits<double>::epsilon() * std::abs(value + other.value)
-           || value - other.value > std::numeric_limits<double>::min();
+    return value - other.value > BASE_EPS * std::max(1.0, std::min(std::abs(value), std::abs(other.value)));
 }
 
 

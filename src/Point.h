@@ -12,6 +12,8 @@
 
 typedef long long ll;
 const int PRECISION = 6;
+const int ROUND_PRECISION = 1e5;
+const double BASE_EPS = 1e-14;
 
 class Coordinate {
 public:
@@ -30,7 +32,9 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const Coordinate &coordinate);
 
     std::size_t hashCode() const {
-        return std::hash<double>{}(value);
+        // BUGFIX: round()! otherwise 2.999999999999911 -> 29999! (should be 30000)
+        // ROUND_PRECISION set to 1e5 for safety (collision is Okay, but 1->2 is a tragedy.)
+        return std::hash<ll>{}((ll) std::round(value * ROUND_PRECISION));
     }
 };
 
