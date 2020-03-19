@@ -46,22 +46,26 @@ public:
     int radius;
 };
 
-std::vector<Point> intersection(const Line &a, const Circle &b);
+typedef std::vector<Point> raw_container_t;
+typedef std::pair<raw_container_t, bool> point_container_t;
 
-std::vector<Point> intersection(const Circle &a, const Line &b);
+point_container_t intersection(const Line &a, const Circle &b);
 
-std::vector<Point> intersection(const Line &a, const Line &b);
+point_container_t intersection(const Circle &a, const Line &b);
 
-std::vector<Point> intersection(const Circle &a, const Circle &b);
+point_container_t intersection(const Line &a, const Line &b);
+
+point_container_t intersection(const Circle &a, const Circle &b);
 
 ll square(ll x);
 
 // variant for auto combination
 using Geometry = std::variant<Line, Circle>;
 
+
 struct interset_visitor {
     template<typename Shape1, typename Shape2>
-    std::vector<Point> operator()(const Shape1 &lhs, const Shape2 &rhs) const {
+    point_container_t operator()(const Shape1 &lhs, const Shape2 &rhs) const {
         return intersection(lhs, rhs);
     }
 };

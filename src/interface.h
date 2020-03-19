@@ -73,10 +73,13 @@ ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2
     }
 
     for (auto &objExist : *inst->shapes) {
-        // TODO: ERROR_CODE::INTERSECTION_EXCP (parallel / overlap lines check!!!)
-        std::vector<Point> intersections =
+        point_container_t intersections =
                 std::visit(interset_visitor{}, obj, objExist);
-        for (auto &p: intersections) {
+        if (!intersections.second) {
+            // overlap lines
+            return ERROR_CODE::INTERSECTION_EXCP;
+        }
+        for (auto &p: intersections.first) {
             if (buf && inst->points->count(p) == 0) {
                 _pushPoint(buf, p, *posBuf);  // increment --> points already exist shouldn't be returned
             }
