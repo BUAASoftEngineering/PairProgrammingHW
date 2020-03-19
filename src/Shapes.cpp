@@ -121,13 +121,11 @@ point_container_t intersection(const Line &a, const Line &b) {
     double bottom = (double) bottomL - (double) bottomR;
 
     if (bottomL == bottomR) {// bottom == 0, inf
-        // TODO
-
         int xtmp3 = x3;
         int xtmp4 = x4;
         int ytmp3 = y3;
         int ytmp4 = y4;
-        if ((x1 - x2) * (x3 - x4) < 0 || (y1 - y2) * (y3 - y4) < 0) {
+        if (dot(x1, y1, x2, y2, x3, y3, x4, y4) < 0) {
             std::swap(xtmp3, xtmp4);
             std::swap(ytmp3, ytmp4);
         }
