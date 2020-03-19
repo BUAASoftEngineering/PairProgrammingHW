@@ -35,11 +35,13 @@ point_container_t intersection(const Line &a, const Circle &b) {
     int dy = y2 - y1;
     ll dr2 = (ll) dx * dx + (ll) dy * dy;
     ll D = (ll) x1 * y2 - (ll) x2 * y1;
-    ll D2 = D * D;
-    ll delta = (ll) b.radius * b.radius * dr2 - D2;
-    if (delta < 0)
+    double D2 = (double) D * D;
+    double delta = (double) b.radius * b.radius * dr2 - D2;
+    Coordinate sqrt_delta_L(sqrt(dr2) * b.radius);
+    Coordinate sqrt_delta_R((double) abs(D));
+    if (sqrt_delta_L < sqrt_delta_R)
         return std::make_pair(container, true);
-    else if (delta == 0) {
+    else if (sqrt_delta_L == sqrt_delta_R) {
         Coordinate x(+(double) D / (double) dr2 * dy + b.center_x);
         Coordinate y(-(double) D / (double) dr2 * dx + b.center_y);
         if (a.checkPoint(x, y)) {
@@ -88,7 +90,7 @@ inline ll cross(int sx1, int sy1, int tx1, int ty1, int sx2, int sy2, int tx2, i
 
 inline bool
 _checkHalfLineOverlap(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, raw_container_t &container) {
-    if ((x1 - x2) * (x3 - x4) < 0 || (y1 - y2) * (y3 - y4) < 0) {
+    if (dot(x1, y1, x2, y2, x3, y3, x4, y4) < 0) {
         // different direction
 
         ll direction = dot(x1, y1, x2, y2, x1, y1, x3, y3); // (v1, v2) \dot (v1, v3)
@@ -120,21 +122,16 @@ point_container_t intersection(const Line &a, const Line &b) {
     ll bottomR = (ll) (y1 - y2) * (x3 - x4);
     double bottom = (double) bottomL - (double) bottomR;
 
-    if (bottomL == bottomR) {// bottom == 0, inf
+    if (bottomL == bottomR) {  // lines parallel
         int xtmp3 = x3;
         int xtmp4 = x4;
         int ytmp3 = y3;
         int ytmp4 = y4;
-        if (dot(x1, y1, x2, y2, x3, y3, x4, y4) < 0) {
+        if (dot(x1, y1, x2, y2, x3, y3, x4, y4) < 0) {  // line1 "-->", line2 "<--", line_temp "-->"
             std::swap(xtmp3, xtmp4);
             std::swap(ytmp3, ytmp4);
         }
-        ll dx1 = x1 - xtmp4;
-        ll dy1 = y1 - ytmp4;
-        ll dx2 = x2 - xtmp3;
-        ll dy2 = y2 - ytmp3;
-        if (dx1 * dy2 == dx2 * dy1) {// cross prod
-            // line line
+        if (cross(x1, y1, xtmp4, ytmp4, x2, y2, xtmp3, ytmp3) == 0) {  // on the same line
             if (a.type == LineType::LINE || b.type == LineType::LINE) {
                 return std::make_pair(container, false);
             } else if (a.type == HALF_LINE && b.type == HALF_LINE) {
@@ -150,15 +147,16 @@ point_container_t intersection(const Line &a, const Line &b) {
                 bool res = _checkHalfLineOverlap(x1, y1, x2, y2, x3, y3, x4, y4, container) ||
                            _checkHalfLineOverlap(x2, y2, x1, y1, x3, y3, x4, y4, container);
                 return std::make_pair(container, res);
-            } else { //if (a.type == SEGMENT_LINE && b.type == HALF_LINE)
+            } else { // a.type == HALF_LINE && b.type == SEGMENT_LINE
                 bool res = _checkHalfLineOverlap(x1, y1, x2, y2, x3, y3, x4, y4, container) ||
                            _checkHalfLineOverlap(x1, y1, x2, y2, x4, y4, x3, y3, container);
                 return std::make_pair(container, res);
             }
         }
-        // parallel
+        // parallel, but not on the same line
         return std::make_pair(container, true);
-    } else {                   // bottom != 0, not inf
+    } else {
+        // not parallel, bottom != 0, have one intersection point
         Coordinate xx(
                 ((double) x1 * y2 / bottom - (double) y1 * x2 / bottom) * (x3 - x4) -
                 ((double) x3 * y4 / bottom - (double) y3 * x4 / bottom) * (x1 - x2));
