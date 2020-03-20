@@ -207,6 +207,22 @@ TEST(CoreTest, precision3) {
     closeManager(mng);
 }
 
+TEST(CoreTest, precision4) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/6327238.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(getIntersectionsCount(mng), 6327238);
+    closeManager(mng);
+}
+
+TEST(CoreTest, precision5) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/9202253.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(getIntersectionsCount(mng), 9202253);
+    closeManager(mng);
+}
+
 TEST(CoreTest, invalid_shape) {
     gManager *mng = createManager();
     EXPECT_EQ(addShape(mng, '?', 6, 10, 10, 6, nullptr, nullptr), ERROR_CODE::INVALID_SHAPE);

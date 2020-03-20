@@ -3,7 +3,6 @@
 //
 
 #include "Point.h"
-#include <limits>
 
 
 Coordinate::Coordinate(double v_double) : value(v_double) {}
@@ -13,12 +12,15 @@ std::ostream &operator<<(std::ostream &os, const Coordinate &coordinate) {
     return os;
 }
 
-// suppose that for 1.0, eps = BASE_EPS
-// then for 100.0, eps = BASE_EPS * 10^2
-// then for 10000.0, eps = BASE_EPS * 10^4
+// for small numbers, use fixed eps = BASE_EPS * DYNAMIC_EPS_START
+// for large numbers, use dynamic eps = BASE_EPS * value
 
 bool Coordinate::operator<(const Coordinate &other) const {
-    return other.value - value > BASE_EPS * std::max(1.0, std::min(std::abs(value), std::abs(other.value)));
+    double scale = std::min(std::abs(value), std::abs(other.value));
+    if (scale >= DYNAMIC_EPS_START)
+        return other.value - value > BASE_EPS * scale;              // dynamic eps
+    else
+        return other.value - value > BASE_EPS * DYNAMIC_EPS_START;  // fixed eps, continuous at the border
 }
 
 bool Coordinate::operator==(const Coordinate &other) const {
@@ -26,7 +28,11 @@ bool Coordinate::operator==(const Coordinate &other) const {
 }
 
 bool Coordinate::operator>(const Coordinate &other) const {
-    return value - other.value > BASE_EPS * std::max(1.0, std::min(std::abs(value), std::abs(other.value)));
+    double scale = std::min(std::abs(value), std::abs(other.value));
+    if (scale >= DYNAMIC_EPS_START)
+        return value - other.value > BASE_EPS * scale;              // dynamic eps
+    else
+        return value - other.value > BASE_EPS * DYNAMIC_EPS_START;  // fixed eps, continuous at the border
 }
 
 

@@ -37,6 +37,9 @@ target_link_libraries(TestShapes gtest_main)
 # Test: core module (libgeometry)
 add_executable(TestCore
         test/testCore.cpp
+        src/interface.cpp
+        src/Point.cpp
+        src/Shapes.cpp
         external/googletest)
 target_link_libraries(TestCore gtest_main)
 target_link_libraries(TestCore libgeometry)
@@ -44,6 +47,9 @@ target_link_libraries(TestCore libgeometry)
 # Test: exceptions (libgeometry)
 add_executable(TestExceptions
         test/testExceptions.cpp
+        src/interface.cpp
+        src/Point.cpp
+        src/Shapes.cpp
         external/googletest)
 target_link_libraries(TestExceptions gtest_main)
 target_link_libraries(TestExceptions libgeometry)
@@ -54,6 +60,9 @@ add_executable(RunAllTests
         test/testShapes.cpp
         test/testCore.cpp
         test/testExceptions.cpp
+        src/interface.cpp
+        src/Point.cpp
+        src/Shapes.cpp
         external/googletest)
 target_link_libraries(RunAllTests gtest_main)
 target_link_libraries(RunAllTests libgeometry)

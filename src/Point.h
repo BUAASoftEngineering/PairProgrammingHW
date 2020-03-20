@@ -13,7 +13,8 @@
 typedef long long ll;
 const int PRECISION = 6;
 const int ROUND_PRECISION = 1e5;
-const double BASE_EPS = 1e-14;
+const double BASE_EPS = 1e-15;
+const double DYNAMIC_EPS_START = 1e5;
 
 class Coordinate {
 public:

@@ -31,10 +31,14 @@ int main(int argc, char *argv[]) {
         printf("%d\n", intersectionsCount);
     }
     /*
-    double xys[100];
+    auto *xys = new double[intersectionsCount * 2 + 100];
     getIntersections(manager, xys);
-    for (int i = 0; i < intersectionsCount; ++i)
-        printf("(%.1lf, %.1lf)\n", xys[i * 2], xys[i * 2 + 1]);
+    for (int i = 0; i < intersectionsCount; ++i) {
+        if (fileout)
+            fprintf(fileout, "%.3lf,%.3lf\n", xys[i * 2], xys[i * 2 + 1]);
+        else
+            printf("%.3lf,%.3lf\n", xys[i * 2], xys[i * 2 + 1]);
+    }
     */
     // close manager
     closeManager(manager);
