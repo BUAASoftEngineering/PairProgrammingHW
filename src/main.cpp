@@ -1,48 +1,66 @@
 #include <iostream>
-#include <unordered_set>
-#include "Shapes.h"
+#include <cstring>
+#include "interface.h"
 
 int main(int argc, char *argv[]) {
     // handle arguments & freopen
+    FILE *filein = nullptr;
+    FILE *fileout = nullptr;
     for (int i = 0; i < argc; ++i) {
         if (strcmp(argv[i], "-i") == 0) {
-            freopen(argv[i + 1], "r", stdin);
+            filein = fopen(argv[i + 1], "r");
         }
         if (strcmp(argv[i], "-o") == 0) {
-            freopen(argv[i + 1], "w", stdout);
+            fileout = fopen(argv[i + 1], "w");
         }
     }
 
-    // main content
-    int objCount;
-    std::cin >> objCount;
-    auto *objs = new std::vector<Geometry>();
+    // create manager
+    auto *manager = createManager();
 
-    // temp vars for input
-    char objType;
-    int x1, y1, x2, y2;
-
-    for (int i = 0; i < objCount; ++i) {
-        std::cin >> objType;
-        if (objType == 'L') {
-            scanf("%d%d%d%d", &x1, &y1, &x2, &y2);
-            objs->emplace_back(Line(x1, y1, x2, y2));
-        } else if (objType == 'C') {
-            scanf("%d%d%d", &x1, &y1, &x2);
-            objs->emplace_back(Circle(x1, y1, x2));
-        } else
-            continue;
-    }
-
-    objCount = objs->size();
-    std::unordered_set<Point, hashCode_Point, equals_Point> container;
-    for (int i = 0; i < objCount; ++i) {
-        for (int j = i + 1; j < objCount; ++j) {
-            std::vector<Point> intersections = std::visit(interset_visitor{}, (*objs)[i], (*objs)[j]);
-            for (Point p: intersections)
-                container.insert(p);
+    // add Geometry Shapes From File
+    ERROR_INFO errInfo = addShapesBatch(manager, filein, nullptr, nullptr);
+    if (errInfo.code != ERROR_CODE::SUCCESS) {
+        std::string errMsg;
+        switch (errInfo.code) {
+            case ERROR_CODE::INTERSECTION_EXCP:
+                errMsg = "Intersection Exception";
+                break;
+            case ERROR_CODE::INVALID_INPUT :
+                errMsg = "Invalid Input";
+                break;
+            case ERROR_CODE::INVALID_SHAPE :
+                errMsg = "Invalid Shape";
+                break;
+            default:
+                errMsg = "Unknown Error";
         }
+        std::cout << "ERROR: " << errMsg;
+        if (errInfo.lineNoStartedWithZero != -1)
+            std::cout << " with line no." << errInfo.lineNoStartedWithZero + 1;
+        if (strcmp(errInfo.messages, "") != 0)
+            std::cout << " ::\n    " << errInfo.messages << std::endl;
+        else
+            std::cout << std::endl;
     }
-    std::cout << container.size() << std::endl;
+
+    int intersectionsCount = getIntersectionsCount(manager);
+    if (fileout) {
+        fprintf(fileout, "%d\n", intersectionsCount);
+    } else {
+        printf("%d\n", intersectionsCount);
+    }
+    /*
+    auto *xys = new double[intersectionsCount * 2 + 100];
+    getIntersections(manager, xys);
+    for (int i = 0; i < intersectionsCount; ++i) {
+        if (fileout)
+            fprintf(fileout, "%.3lf,%.3lf\n", xys[i * 2], xys[i * 2 + 1]);
+        else
+            printf("%.3lf,%.3lf\n", xys[i * 2], xys[i * 2 + 1]);
+    }
+    */
+    // close manager
+//    closeManager(manager);
     return 0;
 }

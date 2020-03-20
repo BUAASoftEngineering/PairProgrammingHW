@@ -8,16 +8,35 @@
 #include <variant>
 #include <vector>
 #include <iostream>
+#include <tuple>
 #include "Point.h"
 
+enum LineType {
+    LINE,
+    HALF_LINE,
+    SEGMENT_LINE,
+};
 
 class Line {
 public:
+    Line() : Line(0, 0, 0, 0) {}
+
     Line(int x1, int y1, int x2, int y2);
+
+    Line(int x1, int y1, int x2, int y2, LineType type);
 
     int p1_x, p1_y;
     int p2_x, p2_y;
+    LineType type;
+
+    virtual bool checkPoint(const Coordinate &x, const Coordinate &y) const;
 };
+
+bool checkPointHalf(const Coordinate &x, const Coordinate &y,
+                    const Line &line);
+
+bool checkPointSegment(const Coordinate &x, const Coordinate &y,
+                       const Line &line);
 
 
 class Circle {
@@ -28,22 +47,25 @@ public:
     int radius;
 };
 
-std::vector<Point> intersection(Line x, Circle y);
+typedef std::tuple<bool, int, Point, Point> point_container_t;
 
-std::vector<Point> intersection(Circle x, Line y);
+point_container_t intersection(const Line &a, const Circle &b);
 
-std::vector<Point> intersection(Line x, Line y);
+point_container_t intersection(const Circle &a, const Line &b);
 
-std::vector<Point> intersection(Circle x, Circle y);
+point_container_t intersection(const Line &a, const Line &b);
+
+point_container_t intersection(const Circle &a, const Circle &b);
 
 ll square(ll x);
 
 // variant for auto combination
 using Geometry = std::variant<Line, Circle>;
 
+
 struct interset_visitor {
     template<typename Shape1, typename Shape2>
-    std::vector<Point> operator()(const Shape1 &lhs, const Shape2 &rhs) const {
+    point_container_t operator()(const Shape1 &lhs, const Shape2 &rhs) const {
         return intersection(lhs, rhs);
     }
 };
