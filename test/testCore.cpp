@@ -68,16 +68,16 @@ TEST(CoreTest, add_getCount) {
     EXPECT_EQ(addShape(mng, 'S', -1, 0, 0, -1, nullptr, nullptr), ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 10);
     // circle(1, 1, 1)
-    EXPECT_EQ(addShape(mng, 'C', 1, 1, 1, INT_MAX, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', 1, 1, 1, 1e5 - 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 14);
     // circle(-1, -1, 1)
-    EXPECT_EQ(addShape(mng, 'C', -1, -1, 1, INT_MAX, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', -1, -1, 1, 1e5 - 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 18);
     // circle(1, -1, 1)
-    EXPECT_EQ(addShape(mng, 'C', 1, -1, 1, INT_MAX, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', 1, -1, 1, 1e5 - 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 22);
     // circle(-1, 1, 1)
-    EXPECT_EQ(addShape(mng, 'C', -1, 1, 1, INT_MAX, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', -1, 1, 1, 1e5 - 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 26);
     closeManager(mng);
 }
@@ -145,19 +145,19 @@ TEST(CoreTest, add_return) {
     EXPECT_DOUBLE_EQ(xys[19], 0);
     EXPECT_DOUBLE_EQ(xys[length + 1], 1234.56);
     // circle(1, 1, 1)
-    EXPECT_EQ(addShape(mng, 'C', 1, 1, 1, INT_MAX, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', 1, 1, 1, 1e5 - 1, xys, &length), ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 14 * 2);
     EXPECT_DOUBLE_EQ(xys[length + 1], 1234.56);
     // circle(-1, -1, 1)
-    EXPECT_EQ(addShape(mng, 'C', -1, -1, 1, INT_MAX, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', -1, -1, 1, 1e5 - 1, xys, &length), ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 18 * 2);
     EXPECT_DOUBLE_EQ(xys[length + 1], 1234.56);
     // circle(1, -1, 1)
-    EXPECT_EQ(addShape(mng, 'C', 1, -1, 1, INT_MAX, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', 1, -1, 1, 1e5 - 1, xys, &length), ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 22 * 2);
     EXPECT_DOUBLE_EQ(xys[length + 1], 1234.56);
     // circle(-1, 1, 1)
-    EXPECT_EQ(addShape(mng, 'C', -1, 1, 1, INT_MAX, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', -1, 1, 1, 1e5 - 1, xys, &length), ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 26 * 2);
     EXPECT_DOUBLE_EQ(xys[length + 1], 1234.56);
 

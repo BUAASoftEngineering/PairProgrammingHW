@@ -316,3 +316,66 @@ TEST(ExceptionTest, InvalidInput5) {
     EXPECT_EQ(getIntersectionsCount(mng), 0);
     closeManager(mng);
 }
+
+TEST(ExceptionTest, InvalidInput6) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/invalid_input6.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::INVALID_INPUT);
+    EXPECT_EQ(getIntersectionsCount(mng), 0);
+    closeManager(mng);
+}
+
+TEST(ExceptionTest, InvalidInput7) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/invalid_input7.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::INVALID_INPUT);
+    EXPECT_EQ(getIntersectionsCount(mng), 0);
+    closeManager(mng);
+}
+
+TEST(ExceptionTest, InvalidShape2) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/invalid_shape2.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::INVALID_SHAPE);
+    EXPECT_EQ(getIntersectionsCount(mng), 1);
+    closeManager(mng);
+}
+TEST(ExceptionTest, InvalidShape3) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/invalid_shape3.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::INVALID_SHAPE);
+    EXPECT_EQ(getIntersectionsCount(mng), 1);
+    closeManager(mng);
+}
+
+TEST(ExceptionTest, InvalidShape4) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/invalid_shape4.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::INVALID_SHAPE);
+    EXPECT_EQ(getIntersectionsCount(mng), 0);
+    closeManager(mng);
+}
+
+TEST(ExceptionTest, InvalidShape5) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/invalid_shape5.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::INVALID_SHAPE);
+    EXPECT_EQ(getIntersectionsCount(mng), 0);
+    closeManager(mng);
+}
+
+TEST(ExceptionTest, InvalidShape6) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/invalid_shape6.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::INVALID_SHAPE);
+    EXPECT_EQ(getIntersectionsCount(mng), 0);
+    closeManager(mng);
+}
+
+TEST(ExceptionTest, InvalidShape7) {
+    gManager *mng = createManager();
+    FILE *filein = fopen("../data/invalid_shape7.txt", "r");
+    EXPECT_EQ(addShapesBatch(mng, filein, nullptr, nullptr), ERROR_CODE::INVALID_SHAPE);
+    EXPECT_EQ(getIntersectionsCount(mng), 0);
+    closeManager(mng);
+}
