@@ -21,7 +21,21 @@ int main(int argc, char *argv[]) {
     // add Geometry Shapes From File
     ERROR_CODE err = addShapesBatch(manager, filein, nullptr, nullptr);
     if (err != ERROR_CODE::SUCCESS) {
-        std::cout << "ERROR: " << err << std::endl;
+        std::string errMsg;
+        switch (err) {
+            case ERROR_CODE::INTERSECTION_EXCP:
+                errMsg = "Intersection Exception";
+                break;
+            case ERROR_CODE::INVALID_INPUT :
+                errMsg = "Invalid Input";
+                break;
+            case ERROR_CODE::INVALID_SHAPE :
+                errMsg = "Invalid Shape";
+                break;
+            default:
+                errMsg = "Unknown Error";
+        }
+        std::cout << "ERROR: " << errMsg << '(' << err << ')' << std::endl;
     }
 
     int intersectionsCount = getIntersectionsCount(manager);
