@@ -41,6 +41,6 @@ int main(int argc, char *argv[]) {
     }
     */
     // close manager
-    closeManager(manager);
+//    closeManager(manager);
     return 0;
 }

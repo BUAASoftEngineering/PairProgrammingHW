@@ -8,6 +8,7 @@
 #include <variant>
 #include <vector>
 #include <iostream>
+#include <tuple>
 #include "Point.h"
 
 enum LineType {
@@ -46,8 +47,7 @@ public:
     int radius;
 };
 
-typedef std::vector<Point> raw_container_t;
-typedef std::pair<raw_container_t, bool> point_container_t;
+typedef std::tuple<bool, int, Point, Point> point_container_t;
 
 point_container_t intersection(const Line &a, const Circle &b);
 

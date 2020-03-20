@@ -77,8 +77,8 @@ void runCase(LineType lineTypeA, LineType lineTypeB,
         Line a(data[0], data[1], data[2], data[3], lineTypeA);
         Line b(data[4], data[5], data[6], data[7], lineTypeB);
         auto res = intersection(a, b);
-        EXPECT_EQ(res.first.size(), expectedNumIntersections);
-        EXPECT_EQ(res.second, expectedValid);
+        EXPECT_EQ(std::get<1>(res), expectedNumIntersections);
+        EXPECT_EQ(std::get<0>(res), expectedValid);
     }
 
     // test the symmetry form of given case
@@ -264,8 +264,8 @@ TEST_LINE_OVERLAP(SEGMENT_LINE, SEGMENT_LINE, overlap, back, false)
 // circle circle overlap
 TEST(ExceptionTest, CIRCLE_CIRCLE) {
     auto res = intersection(Circle(10, 35, 13), Circle(10, 35, 13));
-    EXPECT_EQ(res.first.size(), 0);
-    EXPECT_FALSE(res.second);
+    EXPECT_EQ(std::get<1>(res), 0);
+    EXPECT_FALSE(std::get<0>(res));
 }
 
 // interface

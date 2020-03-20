@@ -23,9 +23,18 @@ bool Line::checkPoint(const Coordinate &x, const Coordinate &y) const {
 Circle::Circle(int x, int y, int r) : center_x(x), center_y(y), radius(r) {}
 
 
+inline void _pushPoint(point_container_t &container, Coordinate &x, Coordinate &y) {
+    const int size = (++std::get<1>(container));
+    if (size == 1)
+        std::get<2>(container) = Point(x, y);
+    else // if (size == 2)
+        std::get<3>(container) = Point(x, y);
+}
+
+
 point_container_t intersection(const Line &a, const Circle &b) {
 //    std::cout << "Line - Circle!\n";
-    std::vector<Point> container;
+    point_container_t container;
     // https://mathworld.wolfram.com/Circle-LineIntersection.html
     int x1 = a.p1_x - b.center_x;
     int y1 = a.p1_y - b.center_y;
@@ -39,15 +48,17 @@ point_container_t intersection(const Line &a, const Circle &b) {
     double delta = (double) b.radius * b.radius * dr2 - D2;
     Coordinate sqrt_delta_L(sqrt(dr2) * b.radius);
     Coordinate sqrt_delta_R((double) abs(D));
-    if (sqrt_delta_L < sqrt_delta_R)
-        return std::make_pair(container, true);
-    else if (sqrt_delta_L == sqrt_delta_R) {
+    if (sqrt_delta_L < sqrt_delta_R) {
+        std::get<0>(container) = true;
+        return container;
+    } else if (sqrt_delta_L == sqrt_delta_R) {
         Coordinate x(+(double) D / (double) dr2 * dy + b.center_x);
         Coordinate y(-(double) D / (double) dr2 * dx + b.center_y);
         if (a.checkPoint(x, y)) {
-            container.emplace_back(x, y);
+            _pushPoint(container, x, y);
         }
-        return std::make_pair(container, true);
+        std::get<0>(container) = true;
+        return container;
     } else {
         double coeff_xx = dx * ((dy >= 0) ? 1 : -1);
         double coeff_yy = abs(dy);
@@ -55,15 +66,16 @@ point_container_t intersection(const Line &a, const Circle &b) {
         Coordinate xc1(+(double) D / (double) dr2 * dy + b.center_x + coeff_xx * sqrt(delta) / (double) dr2);
         Coordinate yc1(-(double) D / (double) dr2 * dx + b.center_y + coeff_yy * sqrt(delta) / (double) dr2);
         if (a.checkPoint(xc1, yc1)) {
-            container.emplace_back(xc1, yc1);
+            _pushPoint(container, xc1, yc1);
         }
 
         Coordinate xc2(+(double) D / (double) dr2 * dy + b.center_x - coeff_xx * sqrt(delta) / (double) dr2);
         Coordinate yc2(-(double) D / (double) dr2 * dx + b.center_y - coeff_yy * sqrt(delta) / (double) dr2);
         if (a.checkPoint(xc2, yc2)) {
-            container.emplace_back(xc2, yc2);
+            _pushPoint(container, xc2, yc2);
         }
-        return std::make_pair(container, true);
+        std::get<0>(container) = true;
+        return container;
     }
 }
 
@@ -89,7 +101,7 @@ inline ll cross(int sx1, int sy1, int tx1, int ty1, int sx2, int sy2, int tx2, i
 }
 
 inline bool
-_checkHalfLineOverlap(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, raw_container_t &container) {
+_checkHalfLineOverlap(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, point_container_t &container) {
     if (dot(x1, y1, x2, y2, x3, y3, x4, y4) < 0) {
         // different direction
 
@@ -102,7 +114,9 @@ _checkHalfLineOverlap(int x1, int y1, int x2, int y2, int x3, int y3, int x4, in
         } else {
             // common endpoint
             // have a intersection
-            container.emplace_back(Coordinate((double) x1), Coordinate((double) y1));
+            Coordinate x_in((double) x1);
+            Coordinate y_in((double) y1);
+            _pushPoint(container, x_in, y_in);
             return true;
         }
     } else {
@@ -111,7 +125,7 @@ _checkHalfLineOverlap(int x1, int y1, int x2, int y2, int x3, int y3, int x4, in
 }
 
 point_container_t intersection(const Line &a, const Line &b) {
-    std::vector<Point> container;
+    point_container_t container;
     // https://en.wikipedia.org/wiki/Line–line_intersection
 //    std::cout << "Line - Line!\n";
     int x1 = a.p1_x, y1 = a.p1_y;
@@ -133,28 +147,34 @@ point_container_t intersection(const Line &a, const Line &b) {
         }
         if (cross(x1, y1, xtmp4, ytmp4, x2, y2, xtmp3, ytmp3) == 0) {  // on the same line
             if (a.type == LineType::LINE || b.type == LineType::LINE) {
-                return std::make_pair(container, false);
+                std::get<0>(container) = false;
+                return container;
             } else if (a.type == HALF_LINE && b.type == HALF_LINE) {
                 bool res = _checkHalfLineOverlap(x1, y1, x2, y2, x3, y3, x4, y4, container);
-                return std::make_pair(container, res);
+                std::get<0>(container) = res;
+                return container;
             } else if (a.type == SEGMENT_LINE && b.type == SEGMENT_LINE) {
                 bool res = _checkHalfLineOverlap(x1, y1, x2, y2, x3, y3, x4, y4, container) ||
                            _checkHalfLineOverlap(x2, y2, x1, y1, x3, y3, x4, y4, container) ||
                            _checkHalfLineOverlap(x1, y1, x2, y2, x4, y4, x3, y3, container) ||
                            _checkHalfLineOverlap(x2, y2, x1, y1, x4, y4, x3, y3, container);
-                return std::make_pair(container, res);
+                std::get<0>(container) = res;
+                return container;
             } else if (a.type == SEGMENT_LINE && b.type == HALF_LINE) {
                 bool res = _checkHalfLineOverlap(x1, y1, x2, y2, x3, y3, x4, y4, container) ||
                            _checkHalfLineOverlap(x2, y2, x1, y1, x3, y3, x4, y4, container);
-                return std::make_pair(container, res);
+                std::get<0>(container) = res;
+                return container;
             } else { // a.type == HALF_LINE && b.type == SEGMENT_LINE
                 bool res = _checkHalfLineOverlap(x1, y1, x2, y2, x3, y3, x4, y4, container) ||
                            _checkHalfLineOverlap(x1, y1, x2, y2, x4, y4, x3, y3, container);
-                return std::make_pair(container, res);
+                std::get<0>(container) = res;
+                return container;
             }
         }
         // parallel, but not on the same line
-        return std::make_pair(container, true);
+        std::get<0>(container) = true;
+        return container;
     } else {
         // not parallel, bottom != 0, have one intersection point
         Coordinate xx(
@@ -164,26 +184,30 @@ point_container_t intersection(const Line &a, const Line &b) {
                 ((double) x1 * y2 / bottom - (double) y1 * x2 / bottom) * (y3 - y4) -
                 ((double) x3 * y4 / bottom - (double) y3 * x4 / bottom) * (y1 - y2));
         if (a.checkPoint(xx, yy) && b.checkPoint(xx, yy)) {
-            container.emplace_back(xx, yy);
+            _pushPoint(container, xx, yy);
         }
-        return std::make_pair(container, true);
+        std::get<0>(container) = true;
+        return container;
     }
 }
 
 point_container_t intersection(const Circle &a, const Circle &b) {
-    std::vector<Point> container;
+    point_container_t container;
     // https://stackoverflow.com/questions/3349125/circle-circle-intersection-points
 //    std::cout << "Circle - Circle!\n";
     int x1 = a.center_x, y1 = a.center_y, r1 = a.radius;
     int x2 = b.center_x, y2 = b.center_y, r2 = b.radius;
 
     if (x1 == x2 && y1 == y2 && r1 == r2) {
-        return std::make_pair(container, false);
+        std::get<0>(container) = false;
+        return container;
     }
 
     ll d2 = square(x1 - x2) + square(y1 - y2);
-    if (d2 > square(r1 + r2) || d2 < square(r1 - r2))
-        return std::make_pair(container, true);
+    if (d2 > square(r1 + r2) || d2 < square(r1 - r2)) {
+        std::get<0>(container) = true;
+        return container;
+    }
 
     double btm = 2.0 * d2;
     double add_x3 = (double) (square(r1) - square(r2) + d2) / btm * (x2 - x1) + x1;
@@ -192,17 +216,23 @@ point_container_t intersection(const Circle &a, const Circle &b) {
     if (d2 == square(r1 + r2) || d2 == square(r1 - r2)) {
         // x1 + (square(r1)-square(r2)+d2)/(2*d2) * (x2-x1);
         // y1 + (square(r1)-square(r2)+d2)/(2*d2) * (y2-y1);
-        container.emplace_back(Coordinate(add_x3), Coordinate(add_y3));
-        return std::make_pair(container, true);
+        Coordinate x_in(add_x3);
+        Coordinate y_in(add_y3);
+        _pushPoint(container, x_in, y_in);
+        std::get<0>(container) = true;
+        return container;
     } else {
         double coeff_x3 = (y2 - y1) / btm;
         double coeff_y3 = (x2 - x1) / btm;
         double insqrt = 4.0 * square(r1) * d2 - square(square(r1) - square(r2) + d2);
-        container.emplace_back(Coordinate(add_x3 + coeff_x3 * sqrt(insqrt)),
-                               Coordinate(add_y3 - coeff_y3 * sqrt(insqrt)));
-        container.emplace_back(Coordinate(add_x3 - coeff_x3 * sqrt(insqrt)),
-                               Coordinate(add_y3 + coeff_y3 * sqrt(insqrt)));
-        return std::make_pair(container, true);
+        Coordinate x_in1(add_x3 + coeff_x3 * sqrt(insqrt));
+        Coordinate y_in1(add_y3 - coeff_y3 * sqrt(insqrt));
+        Coordinate x_in2(add_x3 - coeff_x3 * sqrt(insqrt));
+        Coordinate y_in2(add_y3 + coeff_y3 * sqrt(insqrt));
+        _pushPoint(container, x_in1, y_in1);
+        _pushPoint(container, x_in2, y_in2);
+        std::get<0>(container) = true;
+        return container;
     }
 }
 

@@ -46,15 +46,25 @@ ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2
     for (auto &objExist : *inst->shapes) {
         point_container_t intersections =
                 std::visit(interset_visitor{}, obj, objExist);
-        if (!intersections.second) {
+
+        bool isLegal;
+        int size;
+        Point p1{}, p2{};
+        std::tie(isLegal, size, p1, p2) = intersections;
+
+        if (!isLegal) {
             // overlap lines
             return ERROR_CODE::INTERSECTION_EXCP;
         }
-        for (auto &p: intersections.first) {
-            if (buf && inst->points->count(p) == 0) {
-                _pushPoint(buf, p, *posBuf);  // increment --> points already exist shouldn't be returned
-            }
-            inst->points->insert(p);
+        if (size >= 1) {
+            if (buf && inst->points->count(p1) == 0)
+                _pushPoint(buf, p1, *posBuf);  // increment --> points already exist shouldn't be returned
+            inst->points->insert(p1);
+        }
+        if (size >= 2) {
+            if (buf && inst->points->count(p2) == 0)
+                _pushPoint(buf, p2, *posBuf);  // increment --> points already exist shouldn't be returned
+            inst->points->insert(p2);
         }
     }
     inst->shapes->push_back(obj);
