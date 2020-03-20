@@ -9,7 +9,7 @@ project(Geometry)
 set(CMAKE_CXX_STANDARD 17)
 set(GOOGLETEST_VERSION 1.10.0) # from googletest-master/CML.txt
 
-add_library(libgeometry SHARED src/Point.cpp src/Point.h src/Shapes.cpp src/Shapes.h src/interface.h)
+add_library(libgeometry SHARED src/Point.cpp src/Point.h src/Shapes.cpp src/Shapes.h src/interface.h src/interface.cpp)
 add_executable(Geometry src/main.cpp) # main
 link_directories(${PROJECT_SOURCE_DIR})
 target_link_libraries(Geometry libgeometry)
@@ -40,6 +40,23 @@ add_executable(TestCore
         external/googletest)
 target_link_libraries(TestCore gtest_main)
 target_link_libraries(TestCore libgeometry)
+
+# Test: exceptions (libgeometry)
+add_executable(TestExceptions
+        test/testExceptions.cpp
+        external/googletest)
+target_link_libraries(TestExceptions gtest_main)
+target_link_libraries(TestExceptions libgeometry)
+
+# Test: run all tests
+add_executable(RunAllTests
+        test/testPoint.cpp
+        test/testShapes.cpp
+        test/testCore.cpp
+        test/testExceptions.cpp
+        external/googletest)
+target_link_libraries(RunAllTests gtest_main)
+target_link_libraries(RunAllTests libgeometry)
 
 
 if ("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"
