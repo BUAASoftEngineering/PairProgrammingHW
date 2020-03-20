@@ -31,8 +31,6 @@ void _pushPoint(double *buf, const Point &point, int &pos) {
 ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2, double *buf, int *posBuf) {
     Geometry obj = Line();
 
-    // TODO: ERROR_CODE::INVALID_SHAPE (objType, x1, y1, x2, y2 check!!!)
-
     if (abs(x1) >= 1e5 || abs(y1) >= 1e5 || abs(x2) >= 1e5 || abs(y2) >= 1e5) {
         return ERROR_CODE::INVALID_SHAPE;
     }
@@ -103,7 +101,7 @@ ERROR_CODE readInt(FILE *inputFile, int &dst) {
     int r = readWordToBuffer(inputFile, buf);
     if (r == EOF) { return ERROR_CODE::INVALID_INPUT; }
     if (strlen(buf) > 10) { return ERROR_CODE::INVALID_INPUT; }
-    int res = strtol(buf, &stop, 0);
+    int res = strtol(buf, &stop, 10);
     if (*stop) { return ERROR_CODE::INVALID_INPUT; }
     dst = res;
     return ERROR_CODE::SUCCESS;
@@ -118,14 +116,16 @@ ERROR_CODE readChar(FILE *inputFile, char &dst) {
     return ERROR_CODE::SUCCESS;
 }
 
-ERROR_CODE addShapesBatch(gManager *inst, FILE *inputFile, double *buf, int *posBuf) {
-    // TODO: ERROR_CODE::INVALID_INPUT check (encapsulate a "TRY_READ_LINE" function for stdin/filein/GUIin !!!)
-    // TODO: finer classification of ERROR_CODE::INVALID_INPUT
+ERROR_INFO addShapesBatch(gManager *inst, FILE *inputFile, double *buf, int *posBuf) {
     int objCount;
     ERROR_CODE status;
     status = readInt(inputFile, objCount);
-    if (status != ERROR_CODE::SUCCESS) { return status; }
-    if (objCount <= 0) { return ERROR_CODE::INVALID_INPUT; }
+    if (status != ERROR_CODE::SUCCESS) {
+        return ERROR_INFO{status, 0, "#shapes should be an integer !"};
+    }
+    if (objCount <= 0) {
+        return ERROR_INFO{ERROR_CODE::INVALID_INPUT, 0, "#shapes should > 0 !"};
+    }
 
     // temp vars for input
     char objType;
@@ -133,27 +133,42 @@ ERROR_CODE addShapesBatch(gManager *inst, FILE *inputFile, double *buf, int *pos
 
     for (int i = 0; i < objCount; ++i) {
         status = readChar(inputFile, objType);
-        if (status != ERROR_CODE::SUCCESS) { return status; }
+        if (status != ERROR_CODE::SUCCESS) {
+            return ERROR_INFO{status, i + 1, "The type of shape should be one character !"};
+        }
 
         status = readInt(inputFile, x1);
-        if (status != ERROR_CODE::SUCCESS) { return status; }
+        if (status != ERROR_CODE::SUCCESS) {
+            return ERROR_INFO{status, i + 1, "The args of shape should be an integer !"};
+        }
         status = readInt(inputFile, y1);
-        if (status != ERROR_CODE::SUCCESS) { return status; }
+        if (status != ERROR_CODE::SUCCESS) {
+            return ERROR_INFO{status, i + 1, "The args of shape should be an integer !"};
+        }
         status = readInt(inputFile, x2);
-        if (status != ERROR_CODE::SUCCESS) { return status; }
+        if (status != ERROR_CODE::SUCCESS) {
+            return ERROR_INFO{status, i + 1, "The args of shape should be an integer !"};
+        }
 
         if (objType == 'C') {
             y2 = -1;
         } else {
             status = readInt(inputFile, y2);
-            if (status != ERROR_CODE::SUCCESS) { return status; }
+            if (status != ERROR_CODE::SUCCESS) {
+                return ERROR_INFO{status, i + 1, "The args of shape should be an integer !"};
+            }
         }
 
         status = addShape(inst, objType, x1, y1, x2, y2, buf, posBuf);
-        if (status != ERROR_CODE::SUCCESS)
-            return status;
+        if (status == ERROR_CODE::INVALID_SHAPE) {
+            return ERROR_INFO{status, i + 1,
+                              "The args of shape are invalid !"};
+        } else if (status == ERROR_CODE::INTERSECTION_EXCP) {
+            return ERROR_INFO{status, i + 1,
+                              "This shape will cause infinite number of intersection points !"};
+        }
     }
-    return ERROR_CODE::SUCCESS;
+    return ERROR_INFO{};
 }
 
 int getIntersectionsCount(gManager *inst) {

@@ -19,10 +19,10 @@ int main(int argc, char *argv[]) {
     auto *manager = createManager();
 
     // add Geometry Shapes From File
-    ERROR_CODE err = addShapesBatch(manager, filein, nullptr, nullptr);
-    if (err != ERROR_CODE::SUCCESS) {
+    ERROR_INFO errInfo = addShapesBatch(manager, filein, nullptr, nullptr);
+    if (errInfo.code != ERROR_CODE::SUCCESS) {
         std::string errMsg;
-        switch (err) {
+        switch (errInfo.code) {
             case ERROR_CODE::INTERSECTION_EXCP:
                 errMsg = "Intersection Exception";
                 break;
@@ -35,7 +35,13 @@ int main(int argc, char *argv[]) {
             default:
                 errMsg = "Unknown Error";
         }
-        std::cout << "ERROR: " << errMsg << '(' << err << ')' << std::endl;
+        std::cout << "ERROR: " << errMsg;
+        if (errInfo.lineNoStartedWithZero != -1)
+            std::cout << " with line no." << errInfo.lineNoStartedWithZero + 1;
+        if (strcmp(errInfo.messages, "") != 0)
+            std::cout << " ::\n    " << errInfo.messages << std::endl;
+        else
+            std::cout << std::endl;
     }
 
     int intersectionsCount = getIntersectionsCount(manager);
