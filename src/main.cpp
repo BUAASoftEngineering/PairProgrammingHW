@@ -51,13 +51,13 @@ int main(int argc, char *argv[]) {
         printf("%d\n", intersectionsCount);
     }
     /*
-    auto *xys = new double[intersectionsCount * 2 + 100];
+    auto *xys = new gPoint[intersectionsCount * 2];
     getIntersections(manager, xys);
     for (int i = 0; i < intersectionsCount; ++i) {
         if (fileout)
-            fprintf(fileout, "%.3lf,%.3lf\n", xys[i * 2], xys[i * 2 + 1]);
+            fprintf(fileout, "%.3lf,%.3lf\n", xys[i].x, xys[i].y);
         else
-            printf("%.3lf,%.3lf\n", xys[i * 2], xys[i * 2 + 1]);
+            printf("%.3lf,%.3lf\n", xys[i].x, xys[i].y);
     }
     */
     // close manager

@@ -71,4 +71,21 @@ struct interset_visitor {
 };
 
 
+// Line/Circle ---> gShape for C-style users
+struct gShape {
+    char type;
+    int x1, y1, x2, y2;
+};
+
+gShape gShapeConverter(const Line &s);
+
+gShape gShapeConverter(const Circle &s);
+
+struct gShape_visitor {
+    template<typename Shape1>
+    gShape operator()(const Shape1 &lhs) const {
+        return gShapeConverter(lhs);
+    }
+};
+
 #endif //GEOMETRY_SHAPES_H

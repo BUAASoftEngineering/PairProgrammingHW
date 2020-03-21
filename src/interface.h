@@ -32,7 +32,7 @@ void closeManager(gManager *inst);
 void cleanManager(gManager *inst);
 
 
-void _pushPoint(double *buf, const Point &point, int &pos);
+void _pushPoint(gManager *inst, gPoint *buf, const Point &point, int &pos);
 
 /**
  *
@@ -47,7 +47,7 @@ void _pushPoint(double *buf, const Point &point, int &pos);
  * @return
  */
 ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2,
-                    double *buf, int *posBuf);
+                    gPoint *buf, int *posBuf);
 
 /**
  *
@@ -57,11 +57,12 @@ ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2
  * @param posBuf
  * @return
  */
-ERROR_INFO addShapesBatch(gManager *inst, FILE *inputFile, double *buf, int *posBuf);
+ERROR_INFO addShapesBatch(gManager *inst, FILE *inputFile, gPoint *buf, int *posBuf);
 
 
 int getIntersectionsCount(gManager *inst);
 
-void getIntersections(gManager *inst, double *buf);
+void getIntersections(gManager *inst, gPoint *buf);
 
+void getGeometricShapes(gManager *inst, gShape *buf);
 #endif //GEOMETRY_INTERFACE_H

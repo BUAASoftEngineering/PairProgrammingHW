@@ -287,3 +287,16 @@ bool checkPointSegment(const Coordinate &x, const Coordinate &y,
     }
     return x_check & y_check;
 }
+
+gShape gShapeConverter(const Line &s) {
+    if (s.type == LineType::LINE)
+        return gShape{'L', s.p1_x, s.p1_y, s.p2_x, s.p2_y};
+    else if (s.type == LineType::HALF_LINE)
+        return gShape{'R', s.p1_x, s.p1_y, s.p2_x, s.p2_y};
+    else
+        return gShape{'S', s.p1_x, s.p1_y, s.p2_x, s.p2_y};
+}
+
+gShape gShapeConverter(const Circle &s) {
+    return gShape{'C', s.center_x, s.center_y, s.radius, -1};
+}

@@ -23,12 +23,11 @@ void cleanManager(gManager *inst) {
     inst->points->clear();
 }
 
-void _pushPoint(double *buf, const Point &point, int &pos) {
-    buf[pos++] = point.x.value;
-    buf[pos++] = point.y.value;
+void _pushPoint(gManager *inst, gPoint *buf, const Point &point, int &pos) {
+    buf[pos++] = gPoint{point.x.value, point.y.value};
 }
 
-ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2, double *buf, int *posBuf) {
+ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2, gPoint *buf, int *posBuf) {
     Geometry obj = Line();
 
     if (abs(x1) >= 1e5 || abs(y1) >= 1e5 || abs(x2) >= 1e5 || abs(y2) >= 1e5) {
@@ -74,12 +73,12 @@ ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2
         }
         if (size >= 1) {
             if (buf && inst->points->count(p1) == 0)
-                _pushPoint(buf, p1, *posBuf);  // increment --> points already exist shouldn't be returned
+                _pushPoint(inst, buf, p1, *posBuf);  // increment --> points already exist shouldn't be returned
             inst->points->insert(p1);
         }
         if (size >= 2) {
             if (buf && inst->points->count(p2) == 0)
-                _pushPoint(buf, p2, *posBuf);  // increment --> points already exist shouldn't be returned
+                _pushPoint(inst, buf, p2, *posBuf);  // increment --> points already exist shouldn't be returned
             inst->points->insert(p2);
         }
     }
@@ -116,7 +115,7 @@ ERROR_CODE readChar(FILE *inputFile, char &dst) {
     return ERROR_CODE::SUCCESS;
 }
 
-ERROR_INFO addShapesBatch(gManager *inst, FILE *inputFile, double *buf, int *posBuf) {
+ERROR_INFO addShapesBatch(gManager *inst, FILE *inputFile, gPoint *buf, int *posBuf) {
     int objCount;
     ERROR_CODE status;
     status = readInt(inputFile, objCount);
@@ -175,9 +174,16 @@ int getIntersectionsCount(gManager *inst) {
     return inst->points->size();
 }
 
-void getIntersections(gManager *inst, double *buf) {
+void getIntersections(gManager *inst, gPoint *buf) {
     int pos = 0;
     for (auto &point: *inst->points) {
-        _pushPoint(buf, point, pos);
+        _pushPoint(inst, buf, point, pos);
+    }
+}
+
+void getGeometricShapes(gManager *inst, gShape *buf) {
+    int pos = 0;
+    for (auto &shape: *inst->shapes) {
+        buf[pos++] = std::visit(gShape_visitor{}, shape);
     }
 }
