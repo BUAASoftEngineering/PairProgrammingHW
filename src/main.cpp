@@ -50,6 +50,7 @@ int main(int argc, char *argv[]) {
     } else {
         printf("%d\n", intersectionsCount);
     }
+//    printf("hash:%d, equals:%d\n", GLOBAL_HASH_COUNT, GLOBAL_COLLISION_COUNT);
     /*
     auto *xys = new gPoint[intersectionsCount * 2];
     getIntersections(manager, xys);

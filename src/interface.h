@@ -65,4 +65,5 @@ int getIntersectionsCount(gManager *inst);
 void getIntersections(gManager *inst, gPoint *buf);
 
 void getGeometricShapes(gManager *inst, gShape *buf);
+
 #endif //GEOMETRY_INTERFACE_H

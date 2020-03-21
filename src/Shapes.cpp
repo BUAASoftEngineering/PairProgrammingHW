@@ -236,12 +236,12 @@ point_container_t intersection(const Circle &a, const Circle &b) {
     }
 }
 
-ll square(ll x) {
+inline ll square(ll x) {
     return x * x;
 }
 
-bool checkPointHalf(const Coordinate &x, const Coordinate &y,
-                    const Line &line) {
+inline bool checkPointHalf(const Coordinate &x, const Coordinate &y,
+                           const Line &line) {
     Coordinate xc1(line.p1_x);
     Coordinate yc1(line.p1_y);
     Coordinate xc2(line.p2_x);
@@ -264,8 +264,8 @@ bool checkPointHalf(const Coordinate &x, const Coordinate &y,
     return x_check & y_check;
 }
 
-bool checkPointSegment(const Coordinate &x, const Coordinate &y,
-                       const Line &line) {
+inline bool checkPointSegment(const Coordinate &x, const Coordinate &y,
+                              const Line &line) {
     Coordinate xc1(line.p1_x);
     Coordinate yc1(line.p1_y);
     Coordinate xc2(line.p2_x);

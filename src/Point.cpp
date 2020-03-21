@@ -42,3 +42,6 @@ std::ostream &operator<<(std::ostream &os, const Point &point) {
     os << "(" << point.x << ", " << point.y << ")";
     return os;
 }
+
+int GLOBAL_COLLISION_COUNT = 0;
+int GLOBAL_HASH_COUNT = 0;

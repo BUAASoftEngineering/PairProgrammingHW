@@ -23,7 +23,7 @@ void cleanManager(gManager *inst) {
     inst->points->clear();
 }
 
-void _pushPoint(gManager *inst, gPoint *buf, const Point &point, int &pos) {
+inline void _pushPoint(gManager *inst, gPoint *buf, const Point &point, int &pos) {
     buf[pos++] = gPoint{point.x.value, point.y.value};
 }
 
@@ -86,7 +86,7 @@ ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2
     return ERROR_CODE::SUCCESS;
 }
 
-int readWordToBuffer(FILE *inputFile, char *buf) {
+inline int readWordToBuffer(FILE *inputFile, char *buf) {
     if (inputFile) {
         return fscanf(inputFile, "%s", buf);
     } else {
@@ -94,7 +94,7 @@ int readWordToBuffer(FILE *inputFile, char *buf) {
     }
 }
 
-ERROR_CODE readInt(FILE *inputFile, int &dst) {
+inline ERROR_CODE readInt(FILE *inputFile, int &dst) {
     char buf[256];
     char *stop;
     int r = readWordToBuffer(inputFile, buf);
@@ -106,7 +106,7 @@ ERROR_CODE readInt(FILE *inputFile, int &dst) {
     return ERROR_CODE::SUCCESS;
 }
 
-ERROR_CODE readChar(FILE *inputFile, char &dst) {
+inline ERROR_CODE readChar(FILE *inputFile, char &dst) {
     char buf[256];
     int r = readWordToBuffer(inputFile, buf);
     if (r == EOF) { return ERROR_CODE::INVALID_INPUT; }
@@ -125,6 +125,9 @@ ERROR_INFO addShapesBatch(gManager *inst, FILE *inputFile, gPoint *buf, int *pos
     if (objCount <= 0) {
         return ERROR_INFO{ERROR_CODE::INVALID_INPUT, 0, "#shapes should > 0 !"};
     }
+
+    // RESERVE SPACE FOR POINTS with magic number (max_load_factor) 0.75
+    inst->points->rehash(int(objCount * objCount / 2.0 / 0.75) + 1);
 
     // temp vars for input
     char objType;

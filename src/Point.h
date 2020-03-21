@@ -51,15 +51,20 @@ public:
     friend std::ostream &operator<<(std::ostream &os, const Point &point);
 };
 
+extern int GLOBAL_COLLISION_COUNT;
+extern int GLOBAL_HASH_COUNT;
+
 // Hash Function For Point objects in support of unordered_map<Point>
 struct hashCode_Point {
     std::size_t operator()(const Point &point) const {
+        GLOBAL_HASH_COUNT++;
         return point.x.hashCode() ^ (point.y.hashCode() << 1u);
     }
 };
 
 struct equals_Point {
     bool operator()(const Point &lhs, const Point &rhs) const {
+        GLOBAL_COLLISION_COUNT++;
         return lhs.x == rhs.x && lhs.y == rhs.y;
     }
 };
