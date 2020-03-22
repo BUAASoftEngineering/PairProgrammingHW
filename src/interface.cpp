@@ -9,6 +9,8 @@ gManager *createManager() {
     auto *inst = new gManager;
     inst->shapes = new std::vector<Geometry>();
     inst->points = new std::unordered_set<Point, hashCode_Point, equals_Point>();
+    inst->upperleft = gPoint{-5, 5};
+    inst->lowerright = gPoint{5, -5};
     return inst;
 }
 
@@ -21,41 +23,48 @@ void closeManager(gManager *inst) {
 void cleanManager(gManager *inst) {
     inst->shapes->clear();
     inst->points->clear();
+    inst->upperleft = gPoint{-5, 5};
+    inst->lowerright = gPoint{5, -5};
 }
 
 inline void _pushPoint(gManager *inst, gPoint *buf, const Point &point, int &pos) {
     buf[pos++] = gPoint{point.x.value, point.y.value};
+    inst->upperleft.x = std::min(inst->upperleft.x, point.x.value);
+    inst->upperleft.y = std::max(inst->upperleft.y, point.y.value);
+    inst->lowerright.x = std::max(inst->lowerright.x, point.x.value);
+    inst->lowerright.y = std::min(inst->lowerright.y, point.y.value);
 }
 
-ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2, gPoint *buf, int *posBuf) {
+ERROR_INFO addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2, gPoint *buf, int *posBuf) {
     Geometry obj = Line();
 
     if (abs(x1) >= 1e5 || abs(y1) >= 1e5 || abs(x2) >= 1e5 || abs(y2) >= 1e5) {
-        return ERROR_CODE::INVALID_SHAPE;
+        return ERROR_INFO{ERROR_CODE::VALUE_OUT_OF_RANGE, -1, "Parameters should be within (-100000, 100000) !"};
     }
 
     if (objType == 'L') {
         if (x1 == x2 && y1 == y2) {
-            return ERROR_CODE::INVALID_SHAPE;
+            return ERROR_INFO{ERROR_CODE::INVALID_LINE, -1, "Needs two points to define a line !"};
         }
         obj = Line(x1, y1, x2, y2);
     } else if (objType == 'C') {
         if (x2 <= 0) {
-            return ERROR_CODE::INVALID_SHAPE;
+            return ERROR_INFO{ERROR_CODE::INVALID_CIRCLE, -1, "The radius of a circle should be positive !"};
         }
         obj = Circle(x1, y1, x2);
     } else if (objType == 'R') {
         if (x1 == x2 && y1 == y2) {
-            return ERROR_CODE::INVALID_SHAPE;
+            return ERROR_INFO{ERROR_CODE::INVALID_LINE, -1, "Needs two points to define a halfline !"};
         }
         obj = Line(x1, y1, x2, y2, LineType::HALF_LINE);
     } else if (objType == 'S') {
         if (x1 == x2 && y1 == y2) {
-            return ERROR_CODE::INVALID_SHAPE;
+            return ERROR_INFO{ERROR_CODE::INVALID_LINE, -1, "Needs two points to define a segment !"};
         }
         obj = Line(x1, y1, x2, y2, LineType::SEGMENT_LINE);
     } else {
-        return ERROR_CODE::INVALID_SHAPE;
+        return ERROR_INFO{ERROR_CODE::WRONG_FORMAT, -1,
+                          "The type should be 'C', 'L', 'R' or 'S' !"};
     }
 
     for (auto &objExist : *inst->shapes) {
@@ -69,7 +78,10 @@ ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2
 
         if (!isLegal) {
             // overlap lines
-            return ERROR_CODE::INTERSECTION_EXCP;
+            if (objType == 'C')
+                return ERROR_INFO{ERROR_CODE::CIRCLE_OVERLAP, -1, "This circle overlaps with another circle !"};
+            else
+                return ERROR_INFO{ERROR_CODE::LINE_OVERLAP, -1, "This line overlaps with another line !"};
         }
         if (size >= 1) {
             if (buf && inst->points->count(p1) == 0)
@@ -83,7 +95,7 @@ ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2
         }
     }
     inst->shapes->push_back(obj);
-    return ERROR_CODE::SUCCESS;
+    return ERROR_INFO{};
 }
 
 inline int readWordToBuffer(FILE *inputFile, char *buf) {
@@ -98,10 +110,10 @@ inline ERROR_CODE readInt(FILE *inputFile, int &dst) {
     char buf[256];
     char *stop;
     int r = readWordToBuffer(inputFile, buf);
-    if (r == EOF) { return ERROR_CODE::INVALID_INPUT; }
-    if (strlen(buf) > 10) { return ERROR_CODE::INVALID_INPUT; }
+    if (r == EOF) { return ERROR_CODE::WRONG_FORMAT; }
+    if (strlen(buf) > 10) { return ERROR_CODE::WRONG_FORMAT; }
     int res = strtol(buf, &stop, 10);
-    if (*stop) { return ERROR_CODE::INVALID_INPUT; }
+    if (*stop) { return ERROR_CODE::WRONG_FORMAT; }
     dst = res;
     return ERROR_CODE::SUCCESS;
 }
@@ -109,8 +121,8 @@ inline ERROR_CODE readInt(FILE *inputFile, int &dst) {
 inline ERROR_CODE readChar(FILE *inputFile, char &dst) {
     char buf[256];
     int r = readWordToBuffer(inputFile, buf);
-    if (r == EOF) { return ERROR_CODE::INVALID_INPUT; }
-    if (strlen(buf) != 1) { return ERROR_CODE::INVALID_INPUT; }
+    if (r == EOF) { return ERROR_CODE::WRONG_FORMAT; }
+    if (strlen(buf) != 1) { return ERROR_CODE::WRONG_FORMAT; }
     dst = buf[0];
     return ERROR_CODE::SUCCESS;
 }
@@ -123,7 +135,7 @@ ERROR_INFO addShapesBatch(gManager *inst, FILE *inputFile, gPoint *buf, int *pos
         return ERROR_INFO{status, 0, "#shapes should be an integer !"};
     }
     if (objCount <= 0) {
-        return ERROR_INFO{ERROR_CODE::INVALID_INPUT, 0, "#shapes should > 0 !"};
+        return ERROR_INFO{ERROR_CODE::WRONG_FORMAT, 0, "#shapes should > 0 !"};
     }
 
     // RESERVE SPACE FOR POINTS with magic number (max_load_factor) 0.75
@@ -161,13 +173,10 @@ ERROR_INFO addShapesBatch(gManager *inst, FILE *inputFile, gPoint *buf, int *pos
             }
         }
 
-        status = addShape(inst, objType, x1, y1, x2, y2, buf, posBuf);
-        if (status == ERROR_CODE::INVALID_SHAPE) {
-            return ERROR_INFO{status, i + 1,
-                              "The args of shape are invalid !"};
-        } else if (status == ERROR_CODE::INTERSECTION_EXCP) {
-            return ERROR_INFO{status, i + 1,
-                              "This shape will cause infinite number of intersection points !"};
+        ERROR_INFO singleShape = addShape(inst, objType, x1, y1, x2, y2, buf, posBuf);
+        if (singleShape.code != ERROR_CODE::SUCCESS) {
+            singleShape.lineNoStartedWithZero = i + 1;
+            return singleShape;
         }
     }
     return ERROR_INFO{};
@@ -175,6 +184,10 @@ ERROR_INFO addShapesBatch(gManager *inst, FILE *inputFile, gPoint *buf, int *pos
 
 int getIntersectionsCount(gManager *inst) {
     return inst->points->size();
+}
+
+int getGeometricShapesCount(gManager *inst) {
+    return inst->shapes->size();
 }
 
 void getIntersections(gManager *inst, gPoint *buf) {

@@ -9,14 +9,27 @@ project(Geometry)
 set(CMAKE_CXX_STANDARD 17)
 set(GOOGLETEST_VERSION 1.10.0) # from googletest-master/CML.txt
 
-add_library(libgeometry SHARED src/Point.cpp src/Point.h src/Shapes.cpp src/Shapes.h src/interface.h src/interface.cpp)
-add_executable(Geometry src/main.cpp) # main
-link_directories(${PROJECT_SOURCE_DIR})
-target_link_libraries(Geometry libgeometry)
 
+# General Settings: lib & include
+link_directories(${PROJECT_SOURCE_DIR})
 add_subdirectory(external/googletest)
 include_directories(src
         external/googletest/include)
+
+
+# Cross-Platform Dynamic Link Libraries
+# libgCore.dylib                (MacOS)
+# libgCore.dll & libgCore.lib   (MS Windows)
+add_library(gCore SHARED
+        src/Point.cpp src/Point.h src/Shapes.cpp src/Shapes.h
+        src/interface.cpp src/interface.h
+        src/StdInterface.cpp src/StdInterface.h)
+
+
+# main Executable Program (gCore)
+add_executable(Geometry src/main.cpp)
+target_link_libraries(Geometry gCore)
+
 
 # Test: class Coordinate & class Point
 add_executable(TestPoint
@@ -26,6 +39,7 @@ add_executable(TestPoint
         external/googletest)
 target_link_libraries(TestPoint gtest_main)
 
+
 # Test: class Line & class Circle & variant Geometry & intersections<Shape1, Shape2>
 add_executable(TestShapes
         test/testShapes.cpp
@@ -34,7 +48,8 @@ add_executable(TestShapes
         external/googletest)
 target_link_libraries(TestShapes gtest_main)
 
-# Test: core module (libgeometry)
+
+# Test: interface (gCore)
 add_executable(TestCore
         test/testCore.cpp
         src/interface.cpp
@@ -42,9 +57,10 @@ add_executable(TestCore
         src/Shapes.cpp
         external/googletest)
 target_link_libraries(TestCore gtest_main)
-target_link_libraries(TestCore libgeometry)
+target_link_libraries(TestCore gCore)
 
-# Test: exceptions (libgeometry)
+
+# Test: exceptions (gCore)
 add_executable(TestExceptions
         test/testExceptions.cpp
         src/interface.cpp
@@ -52,9 +68,10 @@ add_executable(TestExceptions
         src/Shapes.cpp
         external/googletest)
 target_link_libraries(TestExceptions gtest_main)
-target_link_libraries(TestExceptions libgeometry)
+target_link_libraries(TestExceptions gCore)
 
-# Test: run all tests
+
+# Test: run all tests (gCore)
 add_executable(RunAllTests
         test/testPoint.cpp
         test/testShapes.cpp
@@ -65,7 +82,7 @@ add_executable(RunAllTests
         src/Shapes.cpp
         external/googletest)
 target_link_libraries(RunAllTests gtest_main)
-target_link_libraries(RunAllTests libgeometry)
+target_link_libraries(RunAllTests gCore)
 
 
 if ("${CMAKE_C_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang"

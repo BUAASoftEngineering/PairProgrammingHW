@@ -9,9 +9,9 @@ TEST(CoreTest, create_clean_close_gets) {
     gManager *mng = createManager();
     gPoint xys[10];
 
-    EXPECT_EQ(addShape(mng, 'L', 0, 0, 1, 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, 0, 1, 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 0);
-    EXPECT_EQ(addShape(mng, 'L', 0, 0, -1, 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, 0, -1, 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 1);
     for (auto &xy : xys)
         xy = gPoint{1234.56, 1234.56};
@@ -21,9 +21,9 @@ TEST(CoreTest, create_clean_close_gets) {
     EXPECT_DOUBLE_EQ(xys[1].x, 1234.56);
     EXPECT_EQ(getIntersectionsCount(mng), 1);
 
-    EXPECT_EQ(addShape(mng, 'C', 3, 4, 5, 1e5 - 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
-    EXPECT_EQ(addShape(mng, 'R', -3, -4, -5, -6, nullptr, nullptr), ERROR_CODE::SUCCESS);
-    EXPECT_EQ(addShape(mng, 'S', 3, 4, 5, 6, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', 3, 4, 5, 1e5 - 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'R', -3, -4, -5, -6, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'S', 3, 4, 5, 6, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     gShape lcs[10];
     for (auto &lc : lcs)
         lc = gShape{'X', -1, -1, -1, -1};
@@ -42,9 +42,9 @@ TEST(CoreTest, create_clean_close_gets) {
 
     cleanManager(mng);
 
-    EXPECT_EQ(addShape(mng, 'L', 0, 0, 1, 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, 0, 1, 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 0);
-    EXPECT_EQ(addShape(mng, 'L', 0, 0, -1, 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, 0, -1, 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 1);
     for (auto &xy : xys)
         xy = gPoint{6543.21, 6543.21};
@@ -60,44 +60,46 @@ TEST(CoreTest, create_clean_close_gets) {
 TEST(CoreTest, add_getCount) {
     gManager *mng = createManager();
     // y = x
-    EXPECT_EQ(addShape(mng, 'L', 0, 0, 1, 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, 0, 1, 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 0);
     // y = -x
-    EXPECT_EQ(addShape(mng, 'L', 0, 0, -1, 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, 0, -1, 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 1);
     // y = -1
-    EXPECT_EQ(addShape(mng, 'L', 0, -1, 1, -1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, -1, 1, -1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 3);
     // y = 1
-    EXPECT_EQ(addShape(mng, 'L', 0, 1, 1, 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, 1, 1, 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 5);
     // x = -1
-    EXPECT_EQ(addShape(mng, 'L', -1, 0, -1, 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', -1, 0, -1, 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 5);
     // x = 1
-    EXPECT_EQ(addShape(mng, 'L', 1, 0, 1, 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 1, 0, 1, 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 5);
     // x = 0, y >= 1
-    EXPECT_EQ(addShape(mng, 'R', 0, 1, 0, 10, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'R', 0, 1, 0, 10, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 6);
     // y = 0, x >= 1
-    EXPECT_EQ(addShape(mng, 'R', 1, 0, 10, 0, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'R', 1, 0, 10, 0, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 7);
     // (-1, 0) & (0, -1)
-    EXPECT_EQ(addShape(mng, 'S', -1, 0, 0, -1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'S', -1, 0, 0, -1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 10);
     // circle(1, 1, 1)
-    EXPECT_EQ(addShape(mng, 'C', 1, 1, 1, 1e5 - 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', 1, 1, 1, 1e5 - 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 14);
     // circle(-1, -1, 1)
-    EXPECT_EQ(addShape(mng, 'C', -1, -1, 1, 1e5 - 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', -1, -1, 1, 1e5 - 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 18);
     // circle(1, -1, 1)
-    EXPECT_EQ(addShape(mng, 'C', 1, -1, 1, 1e5 - 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', 1, -1, 1, 1e5 - 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 22);
     // circle(-1, 1, 1)
-    EXPECT_EQ(addShape(mng, 'C', -1, 1, 1, 1e5 - 1, nullptr, nullptr), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', -1, 1, 1, 1e5 - 1, nullptr, nullptr).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(getIntersectionsCount(mng), 26);
+
+    EXPECT_EQ(getGeometricShapesCount(mng), 13);
     closeManager(mng);
 }
 
@@ -108,17 +110,17 @@ TEST(CoreTest, add_return) {
         xy = gPoint{1234.56, 1234.56};
     int length = 0;
     // y = x
-    EXPECT_EQ(addShape(mng, 'L', 0, 0, 1, 1, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, 0, 1, 1, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 0);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // y = -x
-    EXPECT_EQ(addShape(mng, 'L', 0, 0, -1, 1, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, 0, -1, 1, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 1);
     EXPECT_DOUBLE_EQ(xys[0].x, 0);
     EXPECT_DOUBLE_EQ(xys[0].y, 0);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // y = -1
-    EXPECT_EQ(addShape(mng, 'L', 0, -1, 1, -1, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, -1, 1, -1, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 3);
     EXPECT_DOUBLE_EQ(xys[1].x, -1);
     EXPECT_DOUBLE_EQ(xys[1].y, -1);
@@ -126,7 +128,7 @@ TEST(CoreTest, add_return) {
     EXPECT_DOUBLE_EQ(xys[2].y, -1);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // y = 1
-    EXPECT_EQ(addShape(mng, 'L', 0, 1, 1, 1, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 0, 1, 1, 1, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 5);
     EXPECT_DOUBLE_EQ(xys[3].x, 1);
     EXPECT_DOUBLE_EQ(xys[3].y, 1);
@@ -134,27 +136,27 @@ TEST(CoreTest, add_return) {
     EXPECT_DOUBLE_EQ(xys[4].y, 1);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // x = -1
-    EXPECT_EQ(addShape(mng, 'L', -1, 0, -1, 1, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', -1, 0, -1, 1, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 5);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // x = 1
-    EXPECT_EQ(addShape(mng, 'L', 1, 0, 1, 1, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'L', 1, 0, 1, 1, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 5);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // x = 0, y >= 1
-    EXPECT_EQ(addShape(mng, 'R', 0, 1, 0, 10, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'R', 0, 1, 0, 10, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 6);
     EXPECT_DOUBLE_EQ(xys[5].x, 0);
     EXPECT_DOUBLE_EQ(xys[5].y, 1);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // y = 0, x >= 1
-    EXPECT_EQ(addShape(mng, 'R', 1, 0, 10, 0, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'R', 1, 0, 10, 0, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 7);
     EXPECT_DOUBLE_EQ(xys[6].x, 1);
     EXPECT_DOUBLE_EQ(xys[6].y, 0);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // (-1, 0) & (0, -1)
-    EXPECT_EQ(addShape(mng, 'S', -1, 0, 0, -1, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'S', -1, 0, 0, -1, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 10);
     EXPECT_DOUBLE_EQ(xys[7].x, -0.5);
     EXPECT_DOUBLE_EQ(xys[7].y, -0.5);
@@ -164,25 +166,25 @@ TEST(CoreTest, add_return) {
     EXPECT_DOUBLE_EQ(xys[9].y, 0);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // circle(1, 1, 1)
-    EXPECT_EQ(addShape(mng, 'C', 1, 1, 1, 1e5 - 1, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', 1, 1, 1, 1e5 - 1, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 14);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // circle(-1, -1, 1)
-    EXPECT_EQ(addShape(mng, 'C', -1, -1, 1, 1e5 - 1, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', -1, -1, 1, 1e5 - 1, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 18);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // circle(1, -1, 1)
-    EXPECT_EQ(addShape(mng, 'C', 1, -1, 1, 1e5 - 1, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', 1, -1, 1, 1e5 - 1, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 22);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
     // circle(-1, 1, 1)
-    EXPECT_EQ(addShape(mng, 'C', -1, 1, 1, 1e5 - 1, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'C', -1, 1, 1, 1e5 - 1, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_EQ(length, 26);
     EXPECT_DOUBLE_EQ(xys[length + 1].x, 1234.56);
 
     // refresh storage position from start: xys[0...1]
     length = 0;
-    EXPECT_EQ(addShape(mng, 'S', 6, 10, 10, 6, xys, &length), ERROR_CODE::SUCCESS);
+    EXPECT_EQ(addShape(mng, 'S', 6, 10, 10, 6, xys, &length).code, ERROR_CODE::SUCCESS);
     EXPECT_DOUBLE_EQ(xys[0].x, 8);
     EXPECT_DOUBLE_EQ(xys[0].y, 8);
     EXPECT_DOUBLE_EQ(xys[1].x, -1);

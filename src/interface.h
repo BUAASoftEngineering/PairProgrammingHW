@@ -10,18 +10,24 @@
 
 
 enum ERROR_CODE {
-    SUCCESS, INVALID_SHAPE, INTERSECTION_EXCP, INVALID_INPUT,
+    SUCCESS,
+    WRONG_FORMAT,
+    VALUE_OUT_OF_RANGE,
+    INVALID_LINE, INVALID_CIRCLE,
+    LINE_OVERLAP, CIRCLE_OVERLAP,
 };
 
 struct ERROR_INFO {
     ERROR_CODE code = SUCCESS;
     int lineNoStartedWithZero = -1;
-    char messages[80] = "";
+    char messages[50] = "";
 };
 
 struct gManager {
     std::vector<Geometry> *shapes;
     std::unordered_set<Point, hashCode_Point, equals_Point> *points;
+    gPoint upperleft;
+    gPoint lowerright;
 };
 
 
@@ -46,7 +52,7 @@ void _pushPoint(gManager *inst, gPoint *buf, const Point &point, int &pos);
  * @param posBuf
  * @return
  */
-ERROR_CODE addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2,
+ERROR_INFO addShape(gManager *inst, char objType, int x1, int y1, int x2, int y2,
                     gPoint *buf, int *posBuf);
 
 /**
@@ -61,6 +67,8 @@ ERROR_INFO addShapesBatch(gManager *inst, FILE *inputFile, gPoint *buf, int *pos
 
 
 int getIntersectionsCount(gManager *inst);
+
+int getGeometricShapesCount(gManager *inst);
 
 void getIntersections(gManager *inst, gPoint *buf);
 

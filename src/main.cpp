@@ -1,36 +1,49 @@
 #include <iostream>
 #include <cstring>
-#include "interface.h"
+#include "StdInterface.h"
 
 int main(int argc, char *argv[]) {
     // handle arguments & freopen
-    FILE *filein = nullptr;
+    char *filein = nullptr;
     FILE *fileout = nullptr;
     for (int i = 0; i < argc; ++i) {
         if (strcmp(argv[i], "-i") == 0) {
-            filein = fopen(argv[i + 1], "r");
+            filein = argv[i + 1];
         }
         if (strcmp(argv[i], "-o") == 0) {
             fileout = fopen(argv[i + 1], "w");
         }
     }
 
-    // create manager
-    auto *manager = createManager();
+    // create Figure
+    auto *fig = addFigure();
 
     // add Geometry Shapes From File
-    ERROR_INFO errInfo = addShapesBatch(manager, filein, nullptr, nullptr);
+    ERROR_INFO errInfo;
+    if (filein)
+        errInfo = addShapesToFigureFile(fig, filein);
+    else
+        errInfo = addShapesToFigureStdin(fig);
     if (errInfo.code != ERROR_CODE::SUCCESS) {
         std::string errMsg;
         switch (errInfo.code) {
-            case ERROR_CODE::INTERSECTION_EXCP:
-                errMsg = "Intersection Exception";
+            case ERROR_CODE::WRONG_FORMAT:
+                errMsg = "Wrong Format";
                 break;
-            case ERROR_CODE::INVALID_INPUT :
-                errMsg = "Invalid Input";
+            case ERROR_CODE::VALUE_OUT_OF_RANGE:
+                errMsg = "Value Out of Range";
                 break;
-            case ERROR_CODE::INVALID_SHAPE :
-                errMsg = "Invalid Shape";
+            case ERROR_CODE::INVALID_LINE:
+                errMsg = "Invalid Line";
+                break;
+            case ERROR_CODE::INVALID_CIRCLE:
+                errMsg = "Invalid Circle";
+                break;
+            case ERROR_CODE::LINE_OVERLAP:
+                errMsg = "Line Overlap";
+                break;
+            case ERROR_CODE::CIRCLE_OVERLAP:
+                errMsg = "Circle Overlap";
                 break;
             default:
                 errMsg = "Unknown Error";
@@ -44,7 +57,7 @@ int main(int argc, char *argv[]) {
             std::cout << std::endl;
     }
 
-    int intersectionsCount = getIntersectionsCount(manager);
+    int intersectionsCount = getPointsCount(fig);
     if (fileout) {
         fprintf(fileout, "%d\n", intersectionsCount);
     } else {
@@ -52,16 +65,15 @@ int main(int argc, char *argv[]) {
     }
 //    printf("hash:%d, equals:%d\n", GLOBAL_HASH_COUNT, GLOBAL_COLLISION_COUNT);
     /*
-    auto *xys = new gPoint[intersectionsCount * 2];
-    getIntersections(manager, xys);
+    updatePoints(fig);
     for (int i = 0; i < intersectionsCount; ++i) {
         if (fileout)
-            fprintf(fileout, "%.3lf,%.3lf\n", xys[i].x, xys[i].y);
+            fprintf(fileout, "%.3lf,%.3lf\n", fig->points[i].x, fig->points[i].y);
         else
-            printf("%.3lf,%.3lf\n", xys[i].x, xys[i].y);
+            printf("%.3lf,%.3lf\n", fig->points[i].x, fig->points[i].y);
     }
     */
-    // close manager
-//    closeManager(manager);
+    // close Figure
+//    deleteFigure(fig);
     return 0;
 }
