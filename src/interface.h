@@ -7,21 +7,8 @@
 
 #include <unordered_set>
 #include "Shapes.h"
+#include "StdInterface.h"
 
-
-enum ERROR_CODE {
-    SUCCESS,
-    WRONG_FORMAT,
-    VALUE_OUT_OF_RANGE,
-    INVALID_LINE, INVALID_CIRCLE,
-    LINE_OVERLAP, CIRCLE_OVERLAP,
-};
-
-struct ERROR_INFO {
-    ERROR_CODE code = SUCCESS;
-    int lineNoStartedWithZero = -1;
-    char messages[50] = "";
-};
 
 struct gManager {
     std::vector<Geometry> *shapes;

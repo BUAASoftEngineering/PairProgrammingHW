@@ -60,6 +60,15 @@ target_link_libraries(TestCore gtest_main)
 target_link_libraries(TestCore gCore)
 
 
+# Test: StdInterface (gCore)
+add_executable(TestStdCore
+        test/testStdCore.cpp
+        src/StdInterface.cpp
+        external/googletest)
+target_link_libraries(TestStdCore gtest_main)
+target_link_libraries(TestStdCore gCore)
+
+
 # Test: exceptions (gCore)
 add_executable(TestExceptions
         test/testExceptions.cpp
@@ -77,6 +86,8 @@ add_executable(RunAllTests
         test/testShapes.cpp
         test/testCore.cpp
         test/testExceptions.cpp
+        test/testStdCore.cpp
+        src/StdInterface.cpp
         src/interface.cpp
         src/Point.cpp
         src/Shapes.cpp

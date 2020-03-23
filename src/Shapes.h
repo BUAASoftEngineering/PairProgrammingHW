@@ -10,6 +10,7 @@
 #include <iostream>
 #include <tuple>
 #include "Point.h"
+#include "StdInterface.h"
 
 enum LineType {
     LINE,
@@ -70,12 +71,6 @@ struct interset_visitor {
     }
 };
 
-
-// Line/Circle ---> gShape for C-style users
-struct gShape {
-    char type;
-    int x1, y1, x2, y2;
-};
 
 gShape gShapeConverter(const Line &s);
 

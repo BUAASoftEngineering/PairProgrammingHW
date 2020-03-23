@@ -69,9 +69,4 @@ struct equals_Point {
     }
 };
 
-struct gPoint {
-    double x;
-    double y;
-};
-
 #endif //GEOMETRY_POINT_H
