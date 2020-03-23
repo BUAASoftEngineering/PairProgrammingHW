@@ -3,6 +3,9 @@
 //
 
 #include "StdInterface.h"
+#include "interface.h"
+
+std::vector<gManager *> gManagers;
 
 gFigure *addFigure() {
     auto mng = createManager();

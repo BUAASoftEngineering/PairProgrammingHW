@@ -5,13 +5,34 @@
 #ifndef GEOMETRY_STDINTERFACE_H
 #define GEOMETRY_STDINTERFACE_H
 
-#include "interface.h"
-#include <vector>
+enum ERROR_CODE {
+    SUCCESS,
+    WRONG_FORMAT,
+    VALUE_OUT_OF_RANGE,
+    INVALID_LINE, INVALID_CIRCLE,
+    LINE_OVERLAP, CIRCLE_OVERLAP,
+};
 
-std::vector<gManager *> gManagers;
+struct ERROR_INFO {
+    ERROR_CODE code = SUCCESS;
+    int lineNoStartedWithZero = -1;
+    char messages[50] = "";
+};
+
+
+struct gShape {
+    char type;
+    int x1, y1, x2, y2;
+};
+
+struct gPoint {
+    double x;
+    double y;
+};
+
 
 struct gFigure {
-    unsigned int figureId = 0;
+    unsigned int figureId;
     gShape *shapes;  // only available after updateShapes()
     gPoint *points;  // only available after updatePoints()
     gPoint upperleft;
