@@ -40,11 +40,15 @@ void cleanFigure(gFigure *fig) {
 }
 
 
-inline int readWordToBuffer(char *inputString, char *buf) {
-    return sscanf(inputString, "%s", buf);
+inline int readWordToBuffer(char *&inputString, char *buf) {
+    int pos = 0;
+    auto result = sscanf(inputString, "%s%n", buf, &pos);
+    if (result == 1)
+        inputString += pos;
+    return result;
 }
 
-inline ERROR_CODE readInt(char *inputString, int &dst) {
+inline ERROR_CODE readInt(char *&inputString, int &dst) {
     char buf[256];
     char *stop;
     int r = readWordToBuffer(inputString, buf);
@@ -56,7 +60,7 @@ inline ERROR_CODE readInt(char *inputString, int &dst) {
     return ERROR_CODE::SUCCESS;
 }
 
-inline ERROR_CODE readChar(char *inputString, char &dst) {
+inline ERROR_CODE readChar(char *&inputString, char &dst) {
     char buf[256];
     int r = readWordToBuffer(inputString, buf);
     if (r == EOF) { return ERROR_CODE::WRONG_FORMAT; }
@@ -74,26 +78,33 @@ ERROR_INFO addShapeToFigure(gFigure *fig, gShape obj) {
     return ret;
 }
 
-ERROR_INFO addShapeToFigureString(gFigure *fig, char *desc) {
+ERROR_INFO addShapeToFigureString(gFigure *fig, const char *desc) {
+    int length = strlen(desc);
+    if (length > 1000)
+        return ERROR_INFO{ERROR_CODE::WRONG_FORMAT, -1, "String Length Out Of Range 1000 !"};
+    char desc_copy[1000];
+    char *desc_copy_ptr = desc_copy;
+    strcpy(desc_copy, desc);
+
     // temp vars for input
     char objType;
     int x1, y1, x2, y2;
     ERROR_CODE status;
 
-    status = readChar(desc, objType);
+    status = readChar(desc_copy_ptr, objType);
     if (status != ERROR_CODE::SUCCESS) {
         return ERROR_INFO{status, -1, "The type of shape should be one character !"};
     }
 
-    status = readInt(desc, x1);
+    status = readInt(desc_copy_ptr, x1);
     if (status != ERROR_CODE::SUCCESS) {
         return ERROR_INFO{status, -1, "The args of shape should be an integer !"};
     }
-    status = readInt(desc, y1);
+    status = readInt(desc_copy_ptr, y1);
     if (status != ERROR_CODE::SUCCESS) {
         return ERROR_INFO{status, -1, "The args of shape should be an integer !"};
     }
-    status = readInt(desc, x2);
+    status = readInt(desc_copy_ptr, x2);
     if (status != ERROR_CODE::SUCCESS) {
         return ERROR_INFO{status, -1, "The args of shape should be an integer !"};
     }
@@ -101,7 +112,7 @@ ERROR_INFO addShapeToFigureString(gFigure *fig, char *desc) {
     if (objType == 'C') {
         y2 = -1;
     } else {
-        status = readInt(desc, y2);
+        status = readInt(desc_copy_ptr, y2);
         if (status != ERROR_CODE::SUCCESS) {
             return ERROR_INFO{status, -1, "The args of shape should be an integer !"};
         }
@@ -114,7 +125,7 @@ ERROR_INFO addShapeToFigureString(gFigure *fig, char *desc) {
     return ret;
 }
 
-ERROR_INFO addShapesToFigureFile(gFigure *fig, char *filename) {
+ERROR_INFO addShapesToFigureFile(gFigure *fig, const char *filename) {
     auto mng = gManagers[fig->figureId];
     FILE *filein = fopen(filename, "r");
     auto ret = addShapesBatch(mng, filein, nullptr, nullptr);
@@ -156,12 +167,12 @@ void removeShapeByIndex(gFigure *fig, unsigned int index) {
     delete[] shapes_mem;
 }
 
-int getPointsCount(gFigure *fig) {
+int getPointsCount(const gFigure *fig) {
     auto mng = gManagers[fig->figureId];
     return getIntersectionsCount(mng);
 }
 
-int getShapesCount(gFigure *fig) {
+int getShapesCount(const gFigure *fig) {
     auto mng = gManagers[fig->figureId];
     return getGeometricShapesCount(mng);
 }

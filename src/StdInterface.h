@@ -47,17 +47,17 @@ void cleanFigure(gFigure *fig);
 
 ERROR_INFO addShapeToFigure(gFigure *fig, gShape obj);
 
-ERROR_INFO addShapeToFigureString(gFigure *fig, char *desc);
+ERROR_INFO addShapeToFigureString(gFigure *fig, const char *desc);
 
-ERROR_INFO addShapesToFigureFile(gFigure *fig, char *filename);
+ERROR_INFO addShapesToFigureFile(gFigure *fig, const char *filename);
 
 ERROR_INFO addShapesToFigureStdin(gFigure *fig);
 
 void removeShapeByIndex(gFigure *fig, unsigned int index);
 
-int getPointsCount(gFigure *fig);
+int getPointsCount(const gFigure *fig);
 
-int getShapesCount(gFigure *fig);
+int getShapesCount(const gFigure *fig);
 
 void updatePoints(gFigure *fig);
 
