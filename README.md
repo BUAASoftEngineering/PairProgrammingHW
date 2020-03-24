@@ -1,5 +1,7 @@
 # 结对编程项目
 一个带有GUI支持的几何对象交点求解及画图软件。
+![](https://images.cnblogs.com/cnblogs_com/FuturexGO/1677884/o_200324010618painted.png)
+
 主要特点有：
 - 基于Qt和QCustomplot实现的GUI界面。支持用户在GUI中手动输入参数添加图形和从txt文件批量导入图形，同时支持选定图形及其产生交点的删除。
 - 支持命令行标准输入输出和文件输入输出，此时输出的是交点个数。
@@ -28,6 +30,11 @@ GUI的代码仓库见https://github.com/BUAASoftEngineering/PairProgrammingHWGui
 本仓库中提供了编译好的GUI可执行程序。
 
 解压`bin/gui.zip`，进入解压后的文件目录，运行`BUAASoftwareEngineeringPairProgrammingHWGui.exe`即可。
+
+支持的功能有：
+- 文件批量导入模式。点击菜单栏的File， 点击子菜单的Open...，通过文件选择浏览器选择`.txt`或`.in`文件进行导入。
+- 手动添加模式。使用右上方的选单选择图形类别，再在4个或3个参数输入框中输入图形参数。
+- 删除图形。在画布中点击选中图形按下`Delete`，或在右侧列表中以多选模式选中图形再点击删除按钮。
 
 ## 说明
 本项目使用CLion开发、单元测试、效能分析，再使用Visual Studio Community 2019进行代码分析。
