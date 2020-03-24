@@ -51,4 +51,4 @@ cp "lpx_libgCore(alternative).dll" gui/libgCore.dll
 ./bin/gui/BUAASoftwareEngineeringPairProgrammingHWGui.exe
 ```
 即可运行GUI程序。
-可以通过文件导入`data/exception.txt`，观察弹出窗口的错误提示内容的不同，和通过文件导入正常样例`data/samll_case_GUI.txt`，观察验证两个团队的动态链接库的功能性。
+可以通过文件导入`data/exception.txt`，观察弹出窗口的错误提示内容的不同，观察验证两个团队的动态链接库的功能性。
