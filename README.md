@@ -10,9 +10,9 @@
 - 跨平台，在 MS Windows 和 MacOS 上均通过测试。
 
 ## 使用方法
-保证`exe`所在目录的动态链接库文件齐全。在MS Windows下，命令行程序依赖的DLL为`libgCore.dll`。
+保证`exe`所在目录的动态链接库文件齐全。在MS Windows下，命令行程序依赖的DLL为`libgCore.dll`（核心计算库）、`libgcc_s_seh-1.dll, libstdc++-6.dll, libwinpthread-1.dll`（MinGW的C++标准库）。
 
-对于`bin/`下的命令行程序和解压的GUI程序，应保证所有所需的dll（包括`libgCore.dll`）与对应的exe在同一目录下。
+对于`bin/`下的命令行程序和解压的GUI程序，应保证所有所需的dll（包括上述的4个dll和其他Qt与Windows相关dll）与对应的exe在同一目录下。
 
 ### 命令行程序
 在控制台中运行`./bin/intersect.exe`。
@@ -21,12 +21,6 @@
 - `-i <path to input file>` (optional)，重定向标准输入到文件输入
 - `-o <path to output file>` (optional)，重定向标准输出到文件输出
 
-#### 命令行程序松耦合测试
-
-使用`bin/libgCore_lpx_for_loose_coupling_test.dll`**替换**同级目录下的`bin/libgCore.dll`，再运行`intersect.exe`即可。
-
-两个核心模块对异常的返回信息不同，在合法输入下对精度的处理也不同，因此可观测到不同的输出答案。
-
 ### GUI程序
 
 GUI的代码仓库见https://github.com/BUAASoftEngineering/PairProgrammingHWGui 。
@@ -34,10 +28,6 @@ GUI的代码仓库见https://github.com/BUAASoftEngineering/PairProgrammingHWGui
 本仓库中提供了编译好的GUI可执行程序。
 
 解压`bin/gui.zip`，进入解压后的文件目录，运行`BUAASoftwareEngineeringPairProgrammingHWGui.exe`即可。
-
-#### GUI程序松耦合测试
-
-使用`bin/libgCore_lpx_for_loose_coupling_test.dll`替换解压后程序根目录下的`libgCore.dll`，再运行即可。
 
 ## 说明
 本项目使用CLion开发、单元测试、效能分析，再使用Visual Studio Community 2019进行代码分析。
